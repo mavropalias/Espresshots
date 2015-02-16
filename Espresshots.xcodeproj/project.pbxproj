@@ -15,6 +15,7 @@
 		2E4A53901A92030A00972715 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2E4A538F1A92030A00972715 /* Images.xcassets */; };
 		2E4A53931A92030A00972715 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2E4A53911A92030A00972715 /* LaunchScreen.xib */; };
 		2E4A539F1A92030A00972715 /* EspresshotsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 2E4A539E1A92030A00972715 /* EspresshotsTests.m */; };
+		2E4A53A91A920A3900972715 /* HealthKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2E4A53A81A920A3900972715 /* HealthKit.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -43,6 +44,8 @@
 		2E4A53981A92030A00972715 /* EspresshotsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EspresshotsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		2E4A539D1A92030A00972715 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		2E4A539E1A92030A00972715 /* EspresshotsTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = EspresshotsTests.m; sourceTree = "<group>"; };
+		2E4A53A81A920A3900972715 /* HealthKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HealthKit.framework; path = System/Library/Frameworks/HealthKit.framework; sourceTree = SDKROOT; };
+		2E4A53AA1A920A3900972715 /* Espresshots.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Espresshots.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -50,6 +53,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2E4A53A91A920A3900972715 /* HealthKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -66,6 +70,7 @@
 		2E4A53731A92030A00972715 = {
 			isa = PBXGroup;
 			children = (
+				2E4A53A81A920A3900972715 /* HealthKit.framework */,
 				2E4A537E1A92030A00972715 /* Espresshots */,
 				2E4A539B1A92030A00972715 /* EspresshotsTests */,
 				2E4A537D1A92030A00972715 /* Products */,
@@ -84,6 +89,7 @@
 		2E4A537E1A92030A00972715 /* Espresshots */ = {
 			isa = PBXGroup;
 			children = (
+				2E4A53AA1A920A3900972715 /* Espresshots.entitlements */,
 				2E4A53831A92030A00972715 /* AppDelegate.h */,
 				2E4A53841A92030A00972715 /* AppDelegate.m */,
 				2E4A53861A92030A00972715 /* FirstViewController.h */,
@@ -173,6 +179,12 @@
 				TargetAttributes = {
 					2E4A537B1A92030A00972715 = {
 						CreatedOnToolsVersion = 6.2;
+						DevelopmentTeam = VAT7JZY796;
+						SystemCapabilities = {
+							com.apple.HealthKit = {
+								enabled = 1;
+							};
+						};
 					};
 					2E4A53971A92030A00972715 = {
 						CreatedOnToolsVersion = 6.2;
@@ -351,9 +363,13 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Espresshots/Espresshots.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				INFOPLIST_FILE = Espresshots/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 			};
 			name = Debug;
 		};
@@ -361,9 +377,13 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Espresshots/Espresshots.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				INFOPLIST_FILE = Espresshots/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 			};
 			name = Release;
 		};
