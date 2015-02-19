@@ -7,16 +7,44 @@
 //
 
 #import "AppDelegate.h"
+#import "App.h"
+#import "Timeline.h"
+@import HealthKit;
 
 @interface AppDelegate ()
+
+@property (nonatomic, strong) App *app;
 
 @end
 
 @implementation AppDelegate
 
 
+
+
+
+#pragma mark - Application
+
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    // Override point for customization after application launch.
+    [self initApp];
+    
+    // Style app
+    // -------------------------------------------------------------------------
+    // page title
+    [[UINavigationBar appearance] setTitleTextAttributes: @{NSForegroundColorAttributeName: [UIColor lightGrayColor]}];
+    
+    // navigation bar background
+    //[[UINavigationBar appearance] setBackgroundColor:[UIColor colorWithRed:(210.0f/255.0f) green:(210.0f/255.0f) blue:(210.0f/255.0f) alpha:0.2f]];
+    
+    // toolbar icon buttons
+    [[UIBarButtonItem appearance] setTintColor:[UIColor lightGrayColor]];
+    
+    // 'back' buttons
+    //[[UINavigationBar appearance] setTintColor:[UIColor colorWithRed:0.0f green:(112.0f/255.0f) blue:(186.0f/255.0f) alpha:1.0f]];
+    
+    // Tint color
+    [self.window setTintColor:[UIColor whiteColor]];
+    
     return YES;
 }
 
@@ -31,7 +59,15 @@
 }
 
 - (void)applicationWillEnterForeground:(UIApplication *)application {
-    // Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
+    UITabBarController *tabBarController = (UITabBarController *)[self.window rootViewController];
+    
+    for (UINavigationController *navigationController in tabBarController.viewControllers) {
+        id viewController = navigationController.topViewController;
+        
+        if ([viewController respondsToSelector:@selector(refreshStatistics)]) {
+            [viewController refreshStatistics];
+        }
+    }
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
@@ -40,6 +76,26 @@
 
 - (void)applicationWillTerminate:(UIApplication *)application {
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
+}
+
+
+
+
+
+#pragma mark - Helpers
+
+- (void)initApp {
+    _app = [[App alloc] init];
+    
+    UITabBarController *tabBarController = (UITabBarController *)[self.window rootViewController];
+    
+    for (UINavigationController *navigationController in tabBarController.viewControllers) {
+        id viewController = navigationController.topViewController;
+        
+        if ([viewController respondsToSelector:@selector(setApp:)]) {
+            [viewController setApp:_app];
+        }
+    }
 }
 
 @end
