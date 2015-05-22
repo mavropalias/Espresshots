@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2E3AD7311B0F704B00001563 /* TimelineHeaderView.m in Sources */ = {isa = PBXBuildFile; fileRef = 2E3AD7301B0F704B00001563 /* TimelineHeaderView.m */; };
 		2E4A53821A92030A00972715 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 2E4A53811A92030A00972715 /* main.m */; };
 		2E4A53851A92030A00972715 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 2E4A53841A92030A00972715 /* AppDelegate.m */; };
 		2E4A53881A92030A00972715 /* Timeline.m in Sources */ = {isa = PBXBuildFile; fileRef = 2E4A53871A92030A00972715 /* Timeline.m */; };
@@ -30,6 +31,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		2E3AD72F1B0F704B00001563 /* TimelineHeaderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TimelineHeaderView.h; sourceTree = "<group>"; };
+		2E3AD7301B0F704B00001563 /* TimelineHeaderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TimelineHeaderView.m; sourceTree = "<group>"; };
 		2E4A537C1A92030A00972715 /* Espresshots.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Espresshots.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2E4A53801A92030A00972715 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		2E4A53811A92030A00972715 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -77,6 +80,8 @@
 				2E4A538A1A92030A00972715 /* SecondViewController.m */,
 				2E4A53861A92030A00972715 /* Timeline.h */,
 				2E4A53871A92030A00972715 /* Timeline.m */,
+				2E3AD72F1B0F704B00001563 /* TimelineHeaderView.h */,
+				2E3AD7301B0F704B00001563 /* TimelineHeaderView.m */,
 			);
 			name = Screens;
 			sourceTree = "<group>";
@@ -259,6 +264,7 @@
 			files = (
 				2E4A538B1A92030A00972715 /* SecondViewController.m in Sources */,
 				2E4A53851A92030A00972715 /* AppDelegate.m in Sources */,
+				2E3AD7311B0F704B00001563 /* TimelineHeaderView.m in Sources */,
 				2E4A53AD1A920DC000972715 /* App.m in Sources */,
 				2E4A53881A92030A00972715 /* Timeline.m in Sources */,
 				2E4A53821A92030A00972715 /* main.m in Sources */,
@@ -424,6 +430,7 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = EspresshotsTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Espresshots.app/Espresshots";
@@ -439,6 +446,7 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = EspresshotsTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Espresshots.app/Espresshots";

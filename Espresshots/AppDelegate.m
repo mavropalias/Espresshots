@@ -26,25 +26,10 @@
 #pragma mark - Application
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    [application setStatusBarHidden:YES];
+
     [self initApp];
-    
-    // Style app
-    // -------------------------------------------------------------------------
-    // page title
-    [[UINavigationBar appearance] setTitleTextAttributes: @{NSForegroundColorAttributeName: [UIColor lightGrayColor]}];
-    
-    // navigation bar background
-    //[[UINavigationBar appearance] setBackgroundColor:[UIColor colorWithRed:(210.0f/255.0f) green:(210.0f/255.0f) blue:(210.0f/255.0f) alpha:0.2f]];
-    
-    // toolbar icon buttons
-    [[UIBarButtonItem appearance] setTintColor:[UIColor lightGrayColor]];
-    
-    // 'back' buttons
-    //[[UINavigationBar appearance] setTintColor:[UIColor colorWithRed:0.0f green:(112.0f/255.0f) blue:(186.0f/255.0f) alpha:1.0f]];
-    
-    // Tint color
-    [self.window setTintColor:[UIColor whiteColor]];
-    
+
     return YES;
 }
 

@@ -7,6 +7,7 @@
 //
 
 #import "Timeline.h"
+#import "TimelineHeaderView.h"
 
 @interface Timeline ()
 
@@ -40,7 +41,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    _compactTableMode = true;
+    _compactTableMode = false;
     _samples = _app.samples;
     _groupedSamples = [[NSMutableDictionary alloc] init];
     _dailySums = [[NSMutableDictionary alloc] init];
@@ -54,8 +55,12 @@
     [_app checkForHealthkitPermissions:^(NSError *error) {
         [self refreshStatistics];
     }];
-    
+
     [super viewWillAppear:animated];
+}
+
+- (void)viewDidAppear:(BOOL)animated {
+    [_tableView setContentInset:UIEdgeInsetsMake(0, 0, (self.view.frame.size.height / 2), 0)];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -75,7 +80,7 @@
 - (void)refreshStatistics {
     HKQuantityType *caffeineConsumedType = [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierDietaryCaffeine];
     
-    [_app fetchSamplesForType:caffeineConsumedType unit:[HKUnit gramUnit] days:8 completion:^(NSArray *samples, NSError *error) {
+    [_app fetchSamplesForType:caffeineConsumedType unit:[HKUnit gramUnit] days:300 completion:^(NSArray *samples, NSError *error) {
         dispatch_async(dispatch_get_main_queue(), ^{
             _samples = [samples mutableCopy];
             [_tableView reloadData];
@@ -105,7 +110,7 @@
     NSDateComponents *components = [calendar components:unitFlags
                                                 fromDate:date1
                                                   toDate:date2 options:0];
-    NSInteger days = [components day];
+    NSInteger days = [components day] + 1;
     
     // Calculate individual day sections for use later in the table
     // -------------------------------------------------------------------------
@@ -115,11 +120,11 @@
     for (int section = 0; section < days; section++) {
         //NSDate *now = [NSDate date];
         NSDate *startDate = [calendar dateByAddingUnit:NSCalendarUnitDay
-                                                 value:section+1
+                                                 value:section
                                                 toDate:[calendar startOfDayForDate:oldestSample.startDate]
                                                options:0];
         NSDate *endDate = [calendar dateByAddingUnit:NSCalendarUnitDay
-                                               value:section+2
+                                               value:section+1
                                               toDate:[calendar startOfDayForDate:oldestSample.startDate]
                                              options:0];
         
@@ -127,6 +132,7 @@
         double dailyConsumption = 0.0;
         
         for (HKQuantitySample *sample in _samples) {
+            //NSLog([NSString stringWithFormat:@"%@", sample.startDate]);
             if ([sample.quantity doubleValueForUnit:[HKUnit unitFromString:@"g"]] > _highestSampleConsumption) {
                 _highestSampleConsumption = [sample.quantity doubleValueForUnit:[HKUnit unitFromString:@"g"]];
             }
@@ -157,47 +163,58 @@
 // heightForHeaderInSection
 // =============================================================================
 -(CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
-    return 33.0f;
+    if (_compactTableMode) return 21.0f;
+    else return 60.0f;
 }
 
 // viewForHeaderInSection
 // =============================================================================
 -(UIView *) tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
-    UITableViewCell *headerView = [tableView dequeueReusableCellWithIdentifier:@"header"];
+    TimelineHeaderView *headerView = [tableView dequeueReusableCellWithIdentifier:@"header"];
     
     // Set quantity bar
     // -------------------------------------------------------------------------
     CGFloat progressWidthAdjustment = 1.0f;
     NSNumber *dailySum = [_dailySums objectForKey:[NSString stringWithFormat:@"section%ldsum", (long)section]];
-    CGFloat progressWidth = (((self.view.frame.size.width * 0.8) * [dailySum doubleValue]) / _highestDailyConsumption) * progressWidthAdjustment;
-    CGRect progressFrame = CGRectMake(-1, 0, progressWidth, 40.0f);
-    UIView *progressView = [[UIView alloc] initWithFrame:progressFrame];
-    progressView.backgroundColor = [UIColor colorWithRed:1.0f green:1.0f blue:1.0f alpha:1.0f];
-    progressView.layer.borderColor = [UIColor colorWithRed:0.0f green:0.0f blue:0.0f alpha:1.0f].CGColor;
-    progressView.layer.borderWidth = 1.0f;
-    [headerView.contentView insertSubview:progressView atIndex:0];
-    
+    CGFloat progressWidth = (((self.view.frame.size.width * 0.9) * [dailySum doubleValue]) / _highestDailyConsumption) * progressWidthAdjustment;
+    if (progressWidth < 1.0f) {
+        progressWidth = 1.0f;
+    }
+    headerView.progressViewWidthConstraint.constant = progressWidth;
+
     // Set header title
     // -------------------------------------------------------------------------
     UILabel *headerTitle = (UILabel *)[headerView viewWithTag:1];
-    NSMutableArray *sectionSamples = [_groupedSamples objectForKey:[NSString stringWithFormat:@"section%ld", (long)section]];
-    HKQuantitySample *sample;
-    if (sectionSamples.count > 0) {
-        sample = [sectionSamples objectAtIndex:0];
+
+    if (!_compactTableMode) {
+        headerView.visualEffectView.hidden = NO;
+        headerView.detailLabel.hidden = NO;
+        headerTitle.hidden = NO;
+
+        NSMutableArray *sectionSamples = [_groupedSamples objectForKey:[NSString stringWithFormat:@"section%ld", (long)section]];
+        HKQuantitySample *sample;
+        if (sectionSamples.count > 0) {
+            sample = [sectionSamples objectAtIndex:0];
+        }
+        
+        // Day
+        NSDateFormatter* theDateFormatter = [[NSDateFormatter alloc] init];
+        [theDateFormatter setFormatterBehavior:NSDateFormatterBehaviorDefault];
+        [theDateFormatter setDateFormat:@"EE"];
+        NSString *dateString = [theDateFormatter stringFromDate:sample.startDate];
+        
+        // Amount
+        NSString *amountString = [NSString stringWithFormat:@"%d◉",/*◉*/
+                            (int)(([dailySum doubleValue] * 1000) / _app.defaultEspressoShotMg)];
+        
+        
+        headerTitle.text = [NSString stringWithFormat:@"%@", amountString];
+        headerView.detailLabel.text = dateString;
+    } else {
+        headerTitle.hidden = YES;
+        headerView.detailLabel.hidden = YES;
+        headerView.visualEffectView.hidden = YES;
     }
-    
-    // Day
-    NSDateFormatter* theDateFormatter = [[NSDateFormatter alloc] init];
-    [theDateFormatter setFormatterBehavior:NSDateFormatterBehaviorDefault];
-    [theDateFormatter setDateFormat:@"EE"];
-    NSString *dateString = [theDateFormatter stringFromDate:sample.startDate];
-    
-    // Amount
-    NSString *amountString = [NSString stringWithFormat:@"%d◉",/*◉*/
-                        (int)(([dailySum doubleValue] * 1000) / _app.defaultEspressoShotMg)];
-    
-    
-    headerTitle.text = [NSString stringWithFormat:@"%@   %@", dateString, amountString];
     
     return headerView.contentView;
 }
@@ -221,19 +238,22 @@
     
     NSString *extraInfo = @"";
     if (![sample.source.bundleIdentifier isEqualToString:_app.bundleIdentifier] && sample.source.name) {
-        extraInfo = [NSString stringWithFormat:@"%@ – ", sample.source.name];
+        extraInfo = [NSString stringWithFormat:@" (%@)", sample.source.name];
     }
     
     // Set detail text
+    UILabel *detailText = (UILabel *)[cell viewWithTag:2];
     NSDateFormatter* timeFormatter = [[NSDateFormatter alloc] init];
     [timeFormatter setFormatterBehavior:NSDateFormatterBehavior10_4];
     [timeFormatter setDateFormat:@"HH:mm"];
     NSString *time =  [timeFormatter stringFromDate:sample.startDate];
-    cell.detailTextLabel.text = [NSString stringWithFormat:@"%@%@", extraInfo, time];
+    detailText.text = [NSString stringWithFormat:@"%@",time];
     
     // Set title text
-    cell.textLabel.text = [NSString stringWithFormat:@"%d◉",
-                           (int)([sample.quantity doubleValueForUnit:[HKUnit unitFromString:@"mg"]] / _app.defaultEspressoShotMg)];
+    UILabel *cellText = (UILabel *)[cell viewWithTag:1];
+    cellText.text = [NSString stringWithFormat:@"%d◉ %@",
+                     (int)([sample.quantity doubleValueForUnit:[HKUnit unitFromString:@"mg"]] / _app.defaultEspressoShotMg),
+                     extraInfo];
     
     return cell;
 }

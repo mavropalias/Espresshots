@@ -182,7 +182,7 @@
     NSCalendar *calendar = [NSCalendar currentCalendar];
     
     NSDate *now = [NSDate date];
-    NSDate *startDate = [calendar dateByAddingUnit:NSCalendarUnitDay value:-numDays toDate:now options:0];
+    NSDate *startDate = [calendar startOfDayForDate:[calendar dateByAddingUnit:NSCalendarUnitDay value:-numDays toDate:now options:0]];
     NSDate *endDate = now;
 
     
