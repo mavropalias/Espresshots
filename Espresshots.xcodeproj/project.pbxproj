@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		2E3AD7311B0F704B00001563 /* TimelineHeaderView.m in Sources */ = {isa = PBXBuildFile; fileRef = 2E3AD7301B0F704B00001563 /* TimelineHeaderView.m */; };
+		2E402EF91B1297EE001B4427 /* ScaleCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 2E402EF81B1297EE001B4427 /* ScaleCollectionViewCell.m */; };
 		2E4A53821A92030A00972715 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 2E4A53811A92030A00972715 /* main.m */; };
 		2E4A53851A92030A00972715 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 2E4A53841A92030A00972715 /* AppDelegate.m */; };
 		2E4A53881A92030A00972715 /* Timeline.m in Sources */ = {isa = PBXBuildFile; fileRef = 2E4A53871A92030A00972715 /* Timeline.m */; };
@@ -33,6 +34,8 @@
 /* Begin PBXFileReference section */
 		2E3AD72F1B0F704B00001563 /* TimelineHeaderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TimelineHeaderView.h; sourceTree = "<group>"; };
 		2E3AD7301B0F704B00001563 /* TimelineHeaderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TimelineHeaderView.m; sourceTree = "<group>"; };
+		2E402EF71B1297EE001B4427 /* ScaleCollectionViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScaleCollectionViewCell.h; sourceTree = "<group>"; };
+		2E402EF81B1297EE001B4427 /* ScaleCollectionViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScaleCollectionViewCell.m; sourceTree = "<group>"; };
 		2E4A537C1A92030A00972715 /* Espresshots.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Espresshots.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2E4A53801A92030A00972715 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		2E4A53811A92030A00972715 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -76,6 +79,8 @@
 		2E3AA1421A922E8700265BB9 /* Screens */ = {
 			isa = PBXGroup;
 			children = (
+				2E402EF71B1297EE001B4427 /* ScaleCollectionViewCell.h */,
+				2E402EF81B1297EE001B4427 /* ScaleCollectionViewCell.m */,
 				2E4A53891A92030A00972715 /* SecondViewController.h */,
 				2E4A538A1A92030A00972715 /* SecondViewController.m */,
 				2E4A53861A92030A00972715 /* Timeline.h */,
@@ -265,6 +270,7 @@
 				2E4A538B1A92030A00972715 /* SecondViewController.m in Sources */,
 				2E4A53851A92030A00972715 /* AppDelegate.m in Sources */,
 				2E3AD7311B0F704B00001563 /* TimelineHeaderView.m in Sources */,
+				2E402EF91B1297EE001B4427 /* ScaleCollectionViewCell.m in Sources */,
 				2E4A53AD1A920DC000972715 /* App.m in Sources */,
 				2E4A53881A92030A00972715 /* Timeline.m in Sources */,
 				2E4A53821A92030A00972715 /* main.m in Sources */,

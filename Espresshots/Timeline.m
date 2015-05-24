@@ -8,11 +8,17 @@
 
 #import "Timeline.h"
 #import "TimelineHeaderView.h"
+#import "ScaleCollectionViewCell.h"
 
 @interface Timeline ()
 
 @property (strong, nonatomic) App* app;
 @property (weak, nonatomic) IBOutlet UITableView* tableView;
+@property (weak, nonatomic) IBOutlet UIButton *addCoffeeButton;
+@property (weak, nonatomic) IBOutlet UIVisualEffectView *addCoffeeVisualEffectView;
+@property (weak, nonatomic) IBOutlet UIButton *adjustServingSizeButton;
+@property (weak, nonatomic) IBOutlet UIVisualEffectView *adjustServingSizeVisualEffectView;
+@property (weak, nonatomic) IBOutlet UIImageView *scaleImageView;
 @property (strong, nonatomic) NSMutableArray* samples;
 @property (strong, nonatomic) NSMutableDictionary* groupedSamples;
 @property (strong, nonatomic) NSMutableDictionary* dailySums;
@@ -22,9 +28,6 @@
 @property double highestDailyConsumption;
 
 - (IBAction)pinchOnView:(UIPinchGestureRecognizer *)sender;
-- (IBAction)addDefaultAmount:(id)sender;
-- (IBAction)addDoubleAmount:(id)sender;
-- (IBAction)addTripleAmount:(id)sender;
 - (IBAction)addCustomAmount:(id)sender;
 - (IBAction)editTable:(UIBarButtonItem *)button;
 
@@ -40,14 +43,22 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
+
+    // initial values
     _compactTableMode = true;
     _samples = _app.samples;
     _groupedSamples = [[NSMutableDictionary alloc] init];
     _dailySums = [[NSMutableDictionary alloc] init];
     _highestSampleConsumption = 0.0;
     _highestDailyConsumption = 0.0;
-    
+
+    // style button bgs
+    _addCoffeeVisualEffectView.layer.cornerRadius = _addCoffeeVisualEffectView.frame.size.height / 2;
+    _addCoffeeVisualEffectView.layer.masksToBounds = YES;
+
+    _adjustServingSizeVisualEffectView.layer.cornerRadius = _adjustServingSizeVisualEffectView.frame.size.height / 2;
+    _adjustServingSizeVisualEffectView.layer.masksToBounds = YES;
+
     [_app addBlurEffectToNavigationBar:self.navigationController.navigationBar];
 }
 
@@ -61,6 +72,7 @@
 
 - (void)viewDidAppear:(BOOL)animated {
     [_tableView setContentInset:UIEdgeInsetsMake(0, 0, (self.view.frame.size.height / 2), 0)];
+//    [self drawScale];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -73,6 +85,50 @@
 
 #pragma mark - Helpers
 
+- (void)drawScale {
+    UIGraphicsBeginImageContextWithOptions(CGSizeMake(_scaleImageView.frame.size.width,
+                                                      _scaleImageView.frame.size.height),
+                                           NO,
+                                           0.0);
+    CGContextRef context = UIGraphicsGetCurrentContext();
+
+    CGFloat leftMargin= _scaleImageView.frame.size.width / 2;
+    CGFloat topMargin = 0;
+    CGFloat height = 30;
+    CGFloat width = _scaleImageView.frame.size.width;
+    CGFloat minorTickSpace = 10;
+    int multiple = 5;              // number of minor ticks per major tick
+    CGFloat majorTickLength = 10;  // must be smaller or equal height,
+    CGFloat minorTickLength = 10;  // must be smaller than majorTickLength
+
+    CGFloat baseY = topMargin + height;
+    CGFloat minorY = baseY - minorTickLength;
+    CGFloat majorY = baseY - majorTickLength;
+    CGFloat majorTickSpace = minorTickSpace * multiple;
+
+    int step = 0;
+    for (CGFloat x = leftMargin; x <= leftMargin + width; x += minorTickLength) {
+        if (((int)(x - leftMargin) % (int)majorTickSpace) == 0) {
+            CGContextSetLineWidth(context, 5.0f);
+            //CGContextSetStrokeColorWithColor(context, [app.utility colorWithHex:[key[@"Stroke"] objectForKey:@"Color"]].CGColor);
+        } else {
+            CGContextSetLineWidth(context, 1.0f);
+        }
+
+        CGContextMoveToPoint(context, x, baseY);
+        CGFloat endY = (((int)(x - leftMargin) % (int)majorTickSpace)  == 0) ? majorY : minorY;
+
+        CGContextAddLineToPoint(context, x, endY);
+        CGContextStrokePath(context);
+        step++;  // step contains the minorTickCount in case you want to draw labels
+    }
+
+    // Retrieve the drawn image
+    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    [_scaleImageView setImage:image];
+}
+
 - (void)setApp:(App *)app {
     _app = app;
 }
@@ -80,7 +136,7 @@
 - (void)refreshStatistics {
     HKQuantityType *caffeineConsumedType = [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierDietaryCaffeine];
     
-    [_app fetchSamplesForType:caffeineConsumedType unit:[HKUnit gramUnit] days:11 completion:^(NSArray *samples, NSError *error) {
+    [_app fetchSamplesForType:caffeineConsumedType unit:[HKUnit gramUnit] days:51 completion:^(NSArray *samples, NSError *error) {
         dispatch_async(dispatch_get_main_queue(), ^{
             _samples = [samples mutableCopy];
             [_tableView reloadData];
@@ -277,7 +333,35 @@
 }
 
 
+
+
+
+#pragma mark - UICollectionViewDataSource
+
+- (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView {
+    return 1;
+}
+
+- (NSInteger)collectionView:(UICollectionView *)collectionView
+     numberOfItemsInSection:(NSInteger)section {
+    return 20;
+}
+
+- (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView
+                  cellForItemAtIndexPath:(NSIndexPath *)indexPath {
+    ScaleCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"cell" forIndexPath:indexPath];
+
+    cell.lineLabel.text = @"10";
+
+    return cell;
+}
+
+
+
+
+
 #pragma mark - IBActions
+
 - (IBAction)pinchOnView:(UIPinchGestureRecognizer *)sender {
     if (sender.state == UIGestureRecognizerStateEnded) {
         CGFloat scale = [(UIPinchGestureRecognizer *)sender scale];

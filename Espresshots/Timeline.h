@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "App.h"
 
-@interface Timeline : UIViewController <UITableViewDataSource, UITableViewDelegate>
+@interface Timeline : UIViewController <UITableViewDataSource, UITableViewDelegate, UICollectionViewDataSource>
 
 - (void)setApp:(App *)app;
 - (void)refreshStatistics;
