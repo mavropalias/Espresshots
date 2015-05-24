@@ -41,7 +41,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    _compactTableMode = false;
+    _compactTableMode = true;
     _samples = _app.samples;
     _groupedSamples = [[NSMutableDictionary alloc] init];
     _dailySums = [[NSMutableDictionary alloc] init];
@@ -80,7 +80,7 @@
 - (void)refreshStatistics {
     HKQuantityType *caffeineConsumedType = [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierDietaryCaffeine];
     
-    [_app fetchSamplesForType:caffeineConsumedType unit:[HKUnit gramUnit] days:300 completion:^(NSArray *samples, NSError *error) {
+    [_app fetchSamplesForType:caffeineConsumedType unit:[HKUnit gramUnit] days:11 completion:^(NSArray *samples, NSError *error) {
         dispatch_async(dispatch_get_main_queue(), ^{
             _samples = [samples mutableCopy];
             [_tableView reloadData];
