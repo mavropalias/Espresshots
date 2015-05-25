@@ -16,9 +16,12 @@
 @property (weak, nonatomic) IBOutlet UITableView* tableView;
 @property (weak, nonatomic) IBOutlet UIButton *addCoffeeButton;
 @property (weak, nonatomic) IBOutlet UIVisualEffectView *addCoffeeVisualEffectView;
-@property (weak, nonatomic) IBOutlet UIButton *adjustServingSizeButton;
-@property (weak, nonatomic) IBOutlet UIVisualEffectView *adjustServingSizeVisualEffectView;
+@property (weak, nonatomic) IBOutlet UIButton *removeServingButton;
+@property (weak, nonatomic) IBOutlet UIVisualEffectView *removeServingVisualEffectView;
+@property (weak, nonatomic) IBOutlet UIButton *addServingButton;
+@property (weak, nonatomic) IBOutlet UIVisualEffectView *addServingVisualEffectView;
 @property (weak, nonatomic) IBOutlet UIImageView *scaleImageView;
+@property (weak, nonatomic) IBOutlet UICollectionView *scaleCollectionView;
 @property (strong, nonatomic) NSMutableArray* samples;
 @property (strong, nonatomic) NSMutableDictionary* groupedSamples;
 @property (strong, nonatomic) NSMutableDictionary* dailySums;
@@ -26,6 +29,13 @@
 @property BOOL editingTable;
 @property double highestSampleConsumption;
 @property double highestDailyConsumption;
+
+@property int minValue;
+@property int maxValue;
+@property int defaultValue;
+@property int labelInterval;
+@property int minorStepInterval;
+@property int majorStepInterval;
 
 - (IBAction)pinchOnView:(UIPinchGestureRecognizer *)sender;
 - (IBAction)addCustomAmount:(id)sender;
@@ -52,12 +62,23 @@
     _highestSampleConsumption = 0.0;
     _highestDailyConsumption = 0.0;
 
+    _minValue = 0;
+    _maxValue = 400;
+    _defaultValue = 75;
+    _minorStepInterval = 5;
+    _majorStepInterval = 50;
+    _labelInterval = 10;
+
+
     // style button bgs
     _addCoffeeVisualEffectView.layer.cornerRadius = _addCoffeeVisualEffectView.frame.size.height / 2;
     _addCoffeeVisualEffectView.layer.masksToBounds = YES;
 
-    _adjustServingSizeVisualEffectView.layer.cornerRadius = _adjustServingSizeVisualEffectView.frame.size.height / 2;
-    _adjustServingSizeVisualEffectView.layer.masksToBounds = YES;
+    _addServingVisualEffectView.layer.cornerRadius = _addServingVisualEffectView.frame.size.height / 2;
+    _addServingVisualEffectView.layer.masksToBounds = YES;
+
+    _removeServingVisualEffectView.layer.cornerRadius = _removeServingVisualEffectView.frame.size.height / 2;
+    _removeServingVisualEffectView.layer.masksToBounds = YES;
 
     [_app addBlurEffectToNavigationBar:self.navigationController.navigationBar];
 }
@@ -344,18 +365,68 @@
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView
      numberOfItemsInSection:(NSInteger)section {
-    return 20;
+    return _maxValue / _minorStepInterval;
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView
                   cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     ScaleCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"cell" forIndexPath:indexPath];
 
-    cell.lineLabel.text = @"10";
+    NSLog([NSString stringWithFormat:@"%d", (int)indexPath.row]);
+    // labelInterval
+    if ((indexPath.row * _minorStepInterval) % _labelInterval == 0) {
+        cell.lineLabel.text = [NSString stringWithFormat:@"%ld",
+                               indexPath.row * _minorStepInterval];
+    } else {
+        cell.lineLabel.text = @"";
+    }
+
+    // majorStepInterval
+    if ((indexPath.row * _minorStepInterval) % _majorStepInterval == 0) {
+        cell.lineWidthConstraint.constant = 5;
+    } else if ((indexPath.row * _minorStepInterval) % (_majorStepInterval / 2) == 0) {
+        cell.lineWidthConstraint.constant = 3;
+    }
+    else {
+        cell.lineWidthConstraint.constant = 1;
+    }
+
+
 
     return cell;
 }
 
+- (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate {
+    if ([scrollView isKindOfClass:[UICollectionView class]]) {
+        [self centerCollectionView];
+    } else {
+        //[self centerTable];
+    }
+}
+
+- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
+    if ([scrollView isKindOfClass:[UICollectionView class]]) {
+        [self centerCollectionView];
+    } else {
+        //[self centerTable];
+    }
+}
+
+- (void)centerCollectionView {
+    NSIndexPath *pathForCenterCell = [_scaleCollectionView indexPathForItemAtPoint:CGPointMake(
+                                                                                               CGRectGetMidX(_scaleCollectionView.bounds),
+                                                                                               CGRectGetMidY(_scaleCollectionView.bounds)
+                                                                                               )
+                                      ];
+
+    [_scaleCollectionView scrollToItemAtIndexPath:pathForCenterCell atScrollPosition:UICollectionViewScrollPositionCenteredHorizontally animated:YES];
+}
+
+- (void)centerTable {
+    NSIndexPath *pathForCenterCell = [self.tableView indexPathForRowAtPoint:CGPointMake(CGRectGetMidX(self.tableView.bounds), CGRectGetMidY(self.tableView.bounds))];
+
+    [self.tableView scrollToRowAtIndexPath:pathForCenterCell atScrollPosition:UITableViewScrollPositionMiddle animated:YES];
+}
 
 
 

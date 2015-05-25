@@ -44,15 +44,15 @@
 }
 
 - (void)applicationWillEnterForeground:(UIApplication *)application {
-    UITabBarController *tabBarController = (UITabBarController *)[self.window rootViewController];
-    
-    for (UINavigationController *navigationController in tabBarController.viewControllers) {
-        id viewController = navigationController.topViewController;
-        
-        if ([viewController respondsToSelector:@selector(refreshStatistics)]) {
-            [viewController refreshStatistics];
-        }
-    }
+//    UITabBarController *tabBarController = (UITabBarController *)[self.window rootViewController];
+//    
+//    for (UINavigationController *navigationController in tabBarController.viewControllers) {
+//        id viewController = navigationController.topViewController;
+//        
+//        if ([viewController respondsToSelector:@selector(refreshStatistics)]) {
+//            [viewController refreshStatistics];
+//        }
+//    }
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
@@ -72,14 +72,10 @@
 - (void)initApp {
     _app = [[App alloc] init];
     
-    UITabBarController *tabBarController = (UITabBarController *)[self.window rootViewController];
-    
-    for (UINavigationController *navigationController in tabBarController.viewControllers) {
-        id viewController = navigationController.topViewController;
-        
-        if ([viewController respondsToSelector:@selector(setApp:)]) {
-            [viewController setApp:_app];
-        }
+    Timeline *rootController = (Timeline *)[self.window rootViewController];
+
+    if ([rootController respondsToSelector:@selector(setApp:)]) {
+        [rootController setApp:_app];
     }
 }
 
