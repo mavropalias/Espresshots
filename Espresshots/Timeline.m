@@ -29,10 +29,11 @@
 @property BOOL editingTable;
 @property double highestSampleConsumption;
 @property double highestDailyConsumption;
+@property double userQuantity;
+@property double servingQuantity;
 
 @property int minValue;
 @property int maxValue;
-@property int defaultValue;
 @property int labelInterval;
 @property int minorStepInterval;
 @property int majorStepInterval;
@@ -40,6 +41,9 @@
 - (IBAction)pinchOnView:(UIPinchGestureRecognizer *)sender;
 - (IBAction)addCustomAmount:(id)sender;
 - (IBAction)editTable:(UIBarButtonItem *)button;
+- (IBAction)increaseServings:(id)sender;
+- (IBAction)decreaseServings:(id)sender;
+
 
 @end
 
@@ -61,14 +65,16 @@
     _dailySums = [[NSMutableDictionary alloc] init];
     _highestSampleConsumption = 0.0;
     _highestDailyConsumption = 0.0;
+    [self setAddCoffeeButtonTitle:@"1" subtitle:@"shot"];
 
+    // config values
     _minValue = 0;
     _maxValue = 400;
-    _defaultValue = 75;
+    _servingQuantity = 75.0f;
+    _userQuantity = _servingQuantity;
     _minorStepInterval = 5;
-    _majorStepInterval = 50;
+    _majorStepInterval = _servingQuantity;
     _labelInterval = 10;
-
 
     // style button bgs
     _addCoffeeVisualEffectView.layer.cornerRadius = _addCoffeeVisualEffectView.frame.size.height / 2;
@@ -88,12 +94,14 @@
         [self refreshStatistics];
     }];
 
+    [_tableView setContentInset:UIEdgeInsetsMake(0, 0, (self.view.frame.size.height / 2), 0)];
+
     [super viewWillAppear:animated];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
-    [_tableView setContentInset:UIEdgeInsetsMake(0, 0, (self.view.frame.size.height / 2), 0)];
-//    [self drawScale];
+    NSIndexPath *pathForCenterCell = [NSIndexPath indexPathForItem:(_servingQuantity / _minorStepInterval) inSection:0];
+    [_scaleCollectionView scrollToItemAtIndexPath:pathForCenterCell atScrollPosition:UICollectionViewScrollPositionCenteredHorizontally animated:YES];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -164,6 +172,48 @@
         });
     }];
 }
+
+- (void)scrollScaleToQuantity:(double)quantity {
+    NSIndexPath *pathForCenterCell = [NSIndexPath indexPathForItem:(quantity / _minorStepInterval) inSection:0];
+    [_scaleCollectionView scrollToItemAtIndexPath:pathForCenterCell atScrollPosition:UICollectionViewScrollPositionCenteredHorizontally animated:YES];
+}
+
+- (void)setQuantityFromScale:(double)quantity {
+    _userQuantity = quantity;
+    NSString *newButtonLabel = @"";
+    if ((int)_userQuantity % (int)_servingQuantity == 0) {
+        newButtonLabel = [NSString stringWithFormat:@"%d", (int)(_userQuantity / _servingQuantity)];
+        [self setAddCoffeeButtonTitle:newButtonLabel subtitle:@""];
+    } else {
+        newButtonLabel = [NSString stringWithFormat:@"%d", (int)_userQuantity];
+        [self setAddCoffeeButtonTitle:newButtonLabel subtitle:@"gr"];
+    }
+}
+
+- (void)setAddCoffeeButtonTitle:(NSString *)title subtitle:(NSString *)subtitle {
+    NSMutableParagraphStyle *paragraphStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
+    [paragraphStyle setAlignment:NSTextAlignmentCenter];
+    [paragraphStyle setLineBreakMode:NSLineBreakByWordWrapping];
+
+    UIFont *font1 = [UIFont fontWithName:@"HelveticaNeue-Thin" size:35.0f];
+    UIFont *font2 = [UIFont preferredFontForTextStyle:UIFontTextStyleFootnote];
+
+    NSDictionary *dict1 = @{NSFontAttributeName:font1,
+                            NSForegroundColorAttributeName: [UIColor whiteColor],
+                            NSParagraphStyleAttributeName:paragraphStyle};
+    NSDictionary *dict2 = @{NSFontAttributeName:font2,
+                            NSForegroundColorAttributeName: [UIColor whiteColor],
+                            NSParagraphStyleAttributeName:paragraphStyle};
+
+    NSMutableAttributedString *attString = [[NSMutableAttributedString alloc] init];
+    [attString appendAttributedString:[[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@\n", title] attributes:dict1]];
+    [attString appendAttributedString:[[NSAttributedString alloc] initWithString:subtitle attributes:dict2]];
+
+    [_addCoffeeButton setAttributedTitle:attString forState:UIControlStateNormal];
+    [[_addCoffeeButton titleLabel] setNumberOfLines:0];
+    [[_addCoffeeButton titleLabel] setLineBreakMode:NSLineBreakByWordWrapping];
+}
+
 
 
 
@@ -365,14 +415,20 @@
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView
      numberOfItemsInSection:(NSInteger)section {
-    return _maxValue / _minorStepInterval;
+    return (_maxValue / _minorStepInterval) + 1;
+}
+
+- (UIEdgeInsets)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout insetForSectionAtIndex:(NSInteger)section {
+    return UIEdgeInsetsMake(0,
+                            (self.view.frame.size.width / 2) - 20,
+                            0,
+                            (self.view.frame.size.width / 2) - 20);
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView
                   cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     ScaleCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"cell" forIndexPath:indexPath];
 
-    NSLog([NSString stringWithFormat:@"%d", (int)indexPath.row]);
     // labelInterval
     if ((indexPath.row * _minorStepInterval) % _labelInterval == 0) {
         cell.lineLabel.text = [NSString stringWithFormat:@"%ld",
@@ -384,10 +440,7 @@
     // majorStepInterval
     if ((indexPath.row * _minorStepInterval) % _majorStepInterval == 0) {
         cell.lineWidthConstraint.constant = 5;
-    } else if ((indexPath.row * _minorStepInterval) % (_majorStepInterval / 2) == 0) {
-        cell.lineWidthConstraint.constant = 3;
-    }
-    else {
+    } else {
         cell.lineWidthConstraint.constant = 1;
     }
 
@@ -397,18 +450,14 @@
 }
 
 - (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate {
-    if ([scrollView isKindOfClass:[UICollectionView class]]) {
+    if ([scrollView isKindOfClass:[UICollectionView class]] && !scrollView.isDecelerating && !scrollView.isDragging && !scrollView.isZoomBouncing) {
         [self centerCollectionView];
-    } else {
-        //[self centerTable];
     }
 }
 
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
     if ([scrollView isKindOfClass:[UICollectionView class]]) {
         [self centerCollectionView];
-    } else {
-        //[self centerTable];
     }
 }
 
@@ -418,8 +467,14 @@
                                                                                                CGRectGetMidY(_scaleCollectionView.bounds)
                                                                                                )
                                       ];
+    if ([_scaleCollectionView cellForItemAtIndexPath:pathForCenterCell]) {
+        if (pathForCenterCell.row == 0) {
+            pathForCenterCell = [NSIndexPath indexPathForItem:1 inSection:0];
+        }
 
-    [_scaleCollectionView scrollToItemAtIndexPath:pathForCenterCell atScrollPosition:UICollectionViewScrollPositionCenteredHorizontally animated:YES];
+        [_scaleCollectionView scrollToItemAtIndexPath:pathForCenterCell atScrollPosition:UICollectionViewScrollPositionCenteredHorizontally animated:YES];
+        [self setQuantityFromScale:(pathForCenterCell.row * _minorStepInterval)];
+    }
 }
 
 - (void)centerTable {
@@ -464,6 +519,51 @@
         _editingTable = NO;
         self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemEdit target:self action:@selector(editTable:)];
     }
+}
+
+- (IBAction)increaseServings:(id)sender {
+    int userServings = (int)(_userQuantity / _servingQuantity);
+    int newUserQuantity = (userServings + 1) * _servingQuantity;
+    if (newUserQuantity <= (_maxValue)) {
+        _userQuantity = newUserQuantity;
+    } else {
+        return;
+    }
+
+    NSString *newButtonLabel = @"";
+    if ((int)_userQuantity % (int)_servingQuantity == 0) {
+        newButtonLabel = [NSString stringWithFormat:@"%d", (int)(_userQuantity / _servingQuantity)];
+        [self setAddCoffeeButtonTitle:newButtonLabel
+                             subtitle:(_userQuantity > _servingQuantity) ? @"shots" : @"shot"];
+    } else {
+        newButtonLabel = [NSString stringWithFormat:@"%d", (int)_userQuantity];
+        [self setAddCoffeeButtonTitle:newButtonLabel subtitle:@"gr"];
+    }
+    [self scrollScaleToQuantity:_userQuantity];
+}
+
+- (IBAction)decreaseServings:(id)sender {
+    int userServings = (int)(_userQuantity / _servingQuantity);
+    if (((int)_userQuantity % (int)_servingQuantity) != 0) {
+        userServings++;
+    }
+    int newUserQuantity = (userServings - 1) * _servingQuantity;
+    if (newUserQuantity >= _servingQuantity) {
+        _userQuantity = newUserQuantity;
+    } else {
+        return;
+    }
+
+    NSString *newButtonLabel = @"";
+    if ((int)_userQuantity % (int)_servingQuantity == 0) {
+        newButtonLabel = [NSString stringWithFormat:@"%d", (int)(_userQuantity / _servingQuantity)];
+        [self setAddCoffeeButtonTitle:newButtonLabel
+                             subtitle:(_userQuantity > _servingQuantity) ? @"shots" : @"shot"];
+    } else {
+        newButtonLabel = [NSString stringWithFormat:@"%d", (int)_userQuantity];
+        [self setAddCoffeeButtonTitle:newButtonLabel subtitle:@"gr"];
+    }
+    [self scrollScaleToQuantity:_userQuantity];
 }
 
 
