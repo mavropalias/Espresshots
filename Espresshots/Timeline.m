@@ -301,9 +301,9 @@
     
     // Set quantity bar
     // -------------------------------------------------------------------------
-    CGFloat progressWidthAdjustment = 1.0f;
+    CGFloat progressWidthAdjustment = 0.9f;
     NSNumber *dailySum = [_dailySums objectForKey:[NSString stringWithFormat:@"section%ldsum", (long)section]];
-    CGFloat progressWidth = (((self.view.frame.size.width * 0.9) * [dailySum doubleValue]) / _highestDailyConsumption) * progressWidthAdjustment;
+    CGFloat progressWidth = ((self.view.frame.size.width * [dailySum doubleValue]) / _highestDailyConsumption) * progressWidthAdjustment;
     if (progressWidth < 1.0f) {
         progressWidth = 1.0f;
     }
