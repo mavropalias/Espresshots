@@ -25,6 +25,7 @@
 @property (strong, nonatomic) NSMutableArray* samples;
 @property (strong, nonatomic) NSMutableDictionary* groupedSamples;
 @property (strong, nonatomic) NSMutableDictionary* dailySums;
+@property (nonatomic, assign) BOOL shouldScrollToLastRow;
 @property BOOL compactTableMode;
 @property BOOL editingTable;
 @property double highestSampleConsumption;
@@ -59,13 +60,14 @@
     [super viewDidLoad];
 
     // initial values
+    _shouldScrollToLastRow = YES;
     _compactTableMode = true;
     _samples = _app.samples;
     _groupedSamples = [[NSMutableDictionary alloc] init];
     _dailySums = [[NSMutableDictionary alloc] init];
     _highestSampleConsumption = 0.0;
     _highestDailyConsumption = 0.0;
-    [self setAddCoffeeButtonTitle:@"1" subtitle:@"shot"];
+    [self setAddCoffeeButtonTitle:@"One" subtitle:@"Shot"];
 
     // config values
     _minValue = 0;
@@ -100,8 +102,25 @@
 }
 
 - (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
     NSIndexPath *pathForCenterCell = [NSIndexPath indexPathForItem:(_servingQuantity / _minorStepInterval) inSection:0];
     [_scaleCollectionView scrollToItemAtIndexPath:pathForCenterCell atScrollPosition:UICollectionViewScrollPositionCenteredHorizontally animated:YES];
+}
+
+- (void)viewDidLayoutSubviews
+{
+    [super viewDidLayoutSubviews];
+
+    // Scroll table view to the last row
+    if (_shouldScrollToLastRow)
+    {
+        //_shouldScrollToLastRow = NO;
+        if (_tableView.contentSize.height > (self.view.frame.size.height / 2)) {
+            [self.tableView setContentOffset:CGPointMake(0,
+                                                         _tableView.contentSize.height - (self.view.frame.size.height / 2)
+                                                         )];
+        }
+    }
 }
 
 - (void)didReceiveMemoryWarning {
@@ -114,50 +133,6 @@
 
 #pragma mark - Helpers
 
-- (void)drawScale {
-    UIGraphicsBeginImageContextWithOptions(CGSizeMake(_scaleImageView.frame.size.width,
-                                                      _scaleImageView.frame.size.height),
-                                           NO,
-                                           0.0);
-    CGContextRef context = UIGraphicsGetCurrentContext();
-
-    CGFloat leftMargin= _scaleImageView.frame.size.width / 2;
-    CGFloat topMargin = 0;
-    CGFloat height = 30;
-    CGFloat width = _scaleImageView.frame.size.width;
-    CGFloat minorTickSpace = 10;
-    int multiple = 5;              // number of minor ticks per major tick
-    CGFloat majorTickLength = 10;  // must be smaller or equal height,
-    CGFloat minorTickLength = 10;  // must be smaller than majorTickLength
-
-    CGFloat baseY = topMargin + height;
-    CGFloat minorY = baseY - minorTickLength;
-    CGFloat majorY = baseY - majorTickLength;
-    CGFloat majorTickSpace = minorTickSpace * multiple;
-
-    int step = 0;
-    for (CGFloat x = leftMargin; x <= leftMargin + width; x += minorTickLength) {
-        if (((int)(x - leftMargin) % (int)majorTickSpace) == 0) {
-            CGContextSetLineWidth(context, 5.0f);
-            //CGContextSetStrokeColorWithColor(context, [app.utility colorWithHex:[key[@"Stroke"] objectForKey:@"Color"]].CGColor);
-        } else {
-            CGContextSetLineWidth(context, 1.0f);
-        }
-
-        CGContextMoveToPoint(context, x, baseY);
-        CGFloat endY = (((int)(x - leftMargin) % (int)majorTickSpace)  == 0) ? majorY : minorY;
-
-        CGContextAddLineToPoint(context, x, endY);
-        CGContextStrokePath(context);
-        step++;  // step contains the minorTickCount in case you want to draw labels
-    }
-
-    // Retrieve the drawn image
-    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
-    [_scaleImageView setImage:image];
-}
-
 - (void)setApp:(App *)app {
     _app = app;
 }
@@ -168,6 +143,8 @@
     [_app fetchSamplesForType:caffeineConsumedType unit:[HKUnit gramUnit] days:51 completion:^(NSArray *samples, NSError *error) {
         dispatch_async(dispatch_get_main_queue(), ^{
             _samples = [samples mutableCopy];
+            [_groupedSamples removeAllObjects];
+            [_dailySums removeAllObjects];
             [_tableView reloadData];
         });
     }];
@@ -182,11 +159,30 @@
     _userQuantity = quantity;
     NSString *newButtonLabel = @"";
     if ((int)_userQuantity % (int)_servingQuantity == 0) {
-        newButtonLabel = [NSString stringWithFormat:@"%d", (int)(_userQuantity / _servingQuantity)];
+        switch ((int)(_userQuantity / _servingQuantity)) {
+            case 1:
+                newButtonLabel = [NSString stringWithFormat:@"One"];
+                break;
+            case 2:
+                newButtonLabel = [NSString stringWithFormat:@"Two"];
+                break;
+            case 3:
+                newButtonLabel = [NSString stringWithFormat:@"Three"];
+                break;
+            case 4:
+                newButtonLabel = [NSString stringWithFormat:@"Four"];
+                break;
+            case 5:
+                newButtonLabel = [NSString stringWithFormat:@"Five"];
+                break;
+            default:
+                newButtonLabel = [NSString stringWithFormat:@"One"];
+                break;
+        }
         [self setAddCoffeeButtonTitle:newButtonLabel subtitle:@""];
     } else {
         newButtonLabel = [NSString stringWithFormat:@"%d", (int)_userQuantity];
-        [self setAddCoffeeButtonTitle:newButtonLabel subtitle:@"gr"];
+        [self setAddCoffeeButtonTitle:newButtonLabel subtitle:@"mg"];
     }
 }
 
@@ -206,6 +202,7 @@
                             NSParagraphStyleAttributeName:paragraphStyle};
 
     NSMutableAttributedString *attString = [[NSMutableAttributedString alloc] init];
+    [attString appendAttributedString:[[NSAttributedString alloc] initWithString:@"Log\n" attributes:dict2]];
     [attString appendAttributedString:[[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@\n", title] attributes:dict1]];
     [attString appendAttributedString:[[NSAttributedString alloc] initWithString:subtitle attributes:dict2]];
 
@@ -361,7 +358,7 @@
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
     
     NSMutableArray *sectionSamples = [_groupedSamples objectForKey:[NSString stringWithFormat:@"section%ld", (long)indexPath.section]];
-    HKQuantitySample *sample = [sectionSamples objectAtIndex:indexPath.row];
+    HKQuantitySample *sample = [sectionSamples objectAtIndex:((sectionSamples.count - 1) - indexPath.row)];
     
     NSString *extraInfo = @"";
     if (![sample.source.bundleIdentifier isEqualToString:_app.bundleIdentifier] && sample.source.name) {
@@ -377,9 +374,21 @@
     detailText.text = [NSString stringWithFormat:@"%@",time];
     
     // Set title text
+    NSString *shotsText;
+
+    if ((int)[sample.quantity doubleValueForUnit:[HKUnit unitFromString:@"mg"]] % (int)_app.defaultEspressoShotMg == 0) {
+        int shotsCount = (int)([sample.quantity doubleValueForUnit:[HKUnit unitFromString:@"mg"]] / _app.defaultEspressoShotMg);
+        shotsText = [NSString stringWithFormat:@"%d %@",
+                     shotsCount,
+                     (shotsCount > 1) ? @"Shots" : @"Shot"];
+    } else {
+        shotsText = [NSString stringWithFormat:@"%d mg",
+                 (int)[sample.quantity doubleValueForUnit:[HKUnit unitFromString:@"mg"]]];
+    }
+
     UILabel *cellText = (UILabel *)[cell viewWithTag:1];
-    cellText.text = [NSString stringWithFormat:@"%d◉ %@",
-                     (int)([sample.quantity doubleValueForUnit:[HKUnit unitFromString:@"mg"]] / _app.defaultEspressoShotMg),
+    cellText.text = [NSString stringWithFormat:@"%@ %@",
+                     shotsText,
                      extraInfo];
     
     return cell;
@@ -507,6 +516,7 @@
 - (IBAction)addTripleAmount:(id)sender { [self addAmount:_app.defaultEspressoShotMg * 3]; }
 
 - (IBAction)addCustomAmount:(id)sender {
+    [self addAmount:_userQuantity];
 }
 
 - (IBAction)editTable:(UIBarButtonItem *)button {
@@ -532,7 +542,26 @@
 
     NSString *newButtonLabel = @"";
     if ((int)_userQuantity % (int)_servingQuantity == 0) {
-        newButtonLabel = [NSString stringWithFormat:@"%d", (int)(_userQuantity / _servingQuantity)];
+        switch ((int)(_userQuantity / _servingQuantity)) {
+            case 1:
+                newButtonLabel = [NSString stringWithFormat:@"One"];
+                break;
+            case 2:
+                newButtonLabel = [NSString stringWithFormat:@"Two"];
+                break;
+            case 3:
+                newButtonLabel = [NSString stringWithFormat:@"Three"];
+                break;
+            case 4:
+                newButtonLabel = [NSString stringWithFormat:@"Four"];
+                break;
+            case 5:
+                newButtonLabel = [NSString stringWithFormat:@"Five"];
+                break;
+            default:
+                newButtonLabel = [NSString stringWithFormat:@"One"];
+                break;
+        }
         [self setAddCoffeeButtonTitle:newButtonLabel
                              subtitle:(_userQuantity > _servingQuantity) ? @"shots" : @"shot"];
     } else {
@@ -556,7 +585,26 @@
 
     NSString *newButtonLabel = @"";
     if ((int)_userQuantity % (int)_servingQuantity == 0) {
-        newButtonLabel = [NSString stringWithFormat:@"%d", (int)(_userQuantity / _servingQuantity)];
+        switch ((int)(_userQuantity / _servingQuantity)) {
+            case 1:
+                newButtonLabel = [NSString stringWithFormat:@"One"];
+                break;
+            case 2:
+                newButtonLabel = [NSString stringWithFormat:@"Two"];
+                break;
+            case 3:
+                newButtonLabel = [NSString stringWithFormat:@"Three"];
+                break;
+            case 4:
+                newButtonLabel = [NSString stringWithFormat:@"Four"];
+                break;
+            case 5:
+                newButtonLabel = [NSString stringWithFormat:@"Five"];
+                break;
+            default:
+                newButtonLabel = [NSString stringWithFormat:@"One"];
+                break;
+        }
         [self setAddCoffeeButtonTitle:newButtonLabel
                              subtitle:(_userQuantity > _servingQuantity) ? @"shots" : @"shot"];
     } else {
