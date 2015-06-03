@@ -32,6 +32,8 @@
 @property double highestDailyConsumption;
 @property double userQuantity;
 @property double servingQuantity;
+@property double weeklyQuantity;
+@property double monthlyQuantity;
 
 @property int minValue;
 @property int maxValue;
@@ -287,7 +289,7 @@
 // heightForHeaderInSection
 // =============================================================================
 -(CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
-    if (_compactTableMode) return 21.0f;
+    if (_compactTableMode) return 27.0f;
     else return 60.0f;
 }
 
@@ -300,43 +302,112 @@
     // -------------------------------------------------------------------------
     CGFloat progressWidthAdjustment = 0.9f;
     NSNumber *dailySum = [_dailySums objectForKey:[NSString stringWithFormat:@"section%ldsum", (long)section]];
+    _weeklyQuantity += [dailySum doubleValue];
+    _monthlyQuantity += [dailySum doubleValue];
     CGFloat progressWidth = ((self.view.frame.size.width * [dailySum doubleValue]) / _highestDailyConsumption) * progressWidthAdjustment;
     if (progressWidth < 1.0f) {
         progressWidth = 1.0f;
     }
     headerView.progressViewWidthConstraint.constant = progressWidth;
 
-    // Set header title
+    // Get sample
     // -------------------------------------------------------------------------
-    UILabel *headerTitle = (UILabel *)[headerView viewWithTag:1];
+    NSMutableArray *sectionSamples = [_groupedSamples objectForKey:[NSString stringWithFormat:@"section%ld", (long)section]];
+    HKQuantitySample *sample;
+    if (sectionSamples.count > 0) {
+        sample = [sectionSamples objectAtIndex:0];
+    }
+
+    // Day & Shots
+    // -------------------------------------------------------------------------
+    UILabel *shotsLabel = (UILabel *)[headerView viewWithTag:1];
+    UILabel *dayLabel = (UILabel *)[headerView viewWithTag:3];
+    NSCalendar *calendar = [NSCalendar currentCalendar];
+    NSDateComponents *components = [calendar components:NSCalendarUnitDay
+                                               fromDate:sample.startDate
+                                                 toDate:[NSDate date] options:0];
+    NSInteger daysAgo = [components day] + 1;
+
+    if ([[NSCalendar currentCalendar] isDateInToday:sample.startDate]) {
+        // Day
+        dayLabel.text = @"Today";
+
+        // Shots
+        NSString *amountString = [NSString stringWithFormat:@"%d Shots",/*◉*/
+                                  (int)(([dailySum doubleValue] * 1000) / _app.defaultEspressoShotMg)];
+        shotsLabel.text = [NSString stringWithFormat:@"%@", amountString];
+
+        // Alpha
+        [shotsLabel setAlpha:1.0f];
+        [dayLabel setAlpha:1.0f];
+    } else if ([[NSCalendar currentCalendar] isDateInYesterday:sample.startDate]) {
+        // Day
+        dayLabel.text = @"Yesterday";
+
+        // Shots
+        NSString *amountString = [NSString stringWithFormat:@"%d Shots",/*◉*/
+                                  (int)(([dailySum doubleValue] * 1000) / _app.defaultEspressoShotMg)];
+        shotsLabel.text = [NSString stringWithFormat:@"%@", amountString];
+
+        // Alpha
+        [shotsLabel setAlpha:0.5f];
+        [dayLabel setAlpha:0.5f];
+    } else if (daysAgo == 7) {
+        // Day
+        dayLabel.text = @"Last week";
+
+        // Shots
+        NSString *amountString = [NSString stringWithFormat:@"%d Shots",/*◉*/
+                                  (int)((_weeklyQuantity * 1000) / _app.defaultEspressoShotMg)];
+        shotsLabel.text = [NSString stringWithFormat:@"%@", amountString];
+        _weeklyQuantity = 0.0f;
+
+        // Alpha
+        [shotsLabel setAlpha:0.5f];
+        [dayLabel setAlpha:0.5f];
+    } else if (daysAgo == 14) {
+        // Day
+        dayLabel.text = @"Two weeks ago";
+
+        // Shots
+        NSString *amountString = [NSString stringWithFormat:@"%d Shots",/*◉*/
+                                  (int)((_weeklyQuantity * 1000) / _app.defaultEspressoShotMg)];
+        shotsLabel.text = [NSString stringWithFormat:@"%@", amountString];
+        _weeklyQuantity = 0.0f;
+
+        // Alpha
+        [shotsLabel setAlpha:0.5f];
+        [dayLabel setAlpha:0.5f];
+    } else if (daysAgo == 21) {
+        // Day
+        dayLabel.text = @"Three weeks ago";
+
+        // Shots
+        NSString *amountString = [NSString stringWithFormat:@"%d Shots",/*◉*/
+                                  (int)((_weeklyQuantity * 1000) / _app.defaultEspressoShotMg)];
+        shotsLabel.text = [NSString stringWithFormat:@"%@", amountString];
+        _weeklyQuantity = 0.0f;
+
+        // Alpha
+        [shotsLabel setAlpha:0.5f];
+        [dayLabel setAlpha:0.5f];
+    } else {
+//        NSDateFormatter* theDateFormatter = [[NSDateFormatter alloc] init];
+//        [theDateFormatter setFormatterBehavior:NSDateFormatterBehaviorDefault];
+//        [theDateFormatter setDateFormat:@"EE"];
+//        NSString *dateString = [theDateFormatter stringFromDate:sample.startDate];
+//        headerView.detailLabel.text = dateString;
+//        headerView.detailLabel.text = @"";
+
+        dayLabel.text = @"";
+        shotsLabel.text = @"";
+        [shotsLabel setAlpha:0.5f];
+        [dayLabel setAlpha:0.5f];
+    }
 
     if (!_compactTableMode) {
         headerView.visualEffectView.hidden = NO;
-        headerView.detailLabel.hidden = NO;
-        headerTitle.hidden = NO;
-
-        NSMutableArray *sectionSamples = [_groupedSamples objectForKey:[NSString stringWithFormat:@"section%ld", (long)section]];
-        HKQuantitySample *sample;
-        if (sectionSamples.count > 0) {
-            sample = [sectionSamples objectAtIndex:0];
-        }
-        
-        // Day
-        NSDateFormatter* theDateFormatter = [[NSDateFormatter alloc] init];
-        [theDateFormatter setFormatterBehavior:NSDateFormatterBehaviorDefault];
-        [theDateFormatter setDateFormat:@"EE"];
-        NSString *dateString = [theDateFormatter stringFromDate:sample.startDate];
-        
-        // Amount
-        NSString *amountString = [NSString stringWithFormat:@"%d◉",/*◉*/
-                            (int)(([dailySum doubleValue] * 1000) / _app.defaultEspressoShotMg)];
-        
-        
-        headerTitle.text = [NSString stringWithFormat:@"%@", amountString];
-        headerView.detailLabel.text = dateString;
     } else {
-        headerTitle.hidden = YES;
-        headerView.detailLabel.hidden = YES;
         headerView.visualEffectView.hidden = YES;
     }
     
