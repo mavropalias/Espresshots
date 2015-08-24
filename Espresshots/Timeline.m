@@ -116,7 +116,7 @@
     // Scroll table view to the last row
     if (_shouldScrollToLastRow)
     {
-        //_shouldScrollToLastRow = NO;
+        _shouldScrollToLastRow = NO;
         if (_tableView.contentSize.height > (self.view.frame.size.height / 2)) {
             [self.tableView setContentOffset:CGPointMake(0,
                                                          _tableView.contentSize.height - (self.view.frame.size.height / 2)
@@ -222,10 +222,9 @@
 // numberOfSectionsInTableView
 // =============================================================================
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    if (!(_samples.count > 0)) {
-        return 0;
-    }
-    
+    if (!(_samples.count > 0)) { return 0; }
+    NSLog(@"%lu samples", (unsigned long)_samples.count);
+
     // Calculate the number of days since the oldest sample
     // -------------------------------------------------------------------------
     HKQuantitySample *oldestSample = [_samples lastObject];
@@ -237,6 +236,8 @@
                                                 fromDate:date1
                                                   toDate:date2 options:0];
     NSInteger days = [components day] + 1;
+
+    NSLog(@"%@ / %@ / %ld", date1, date2, (long)days);
     
     // Calculate individual day sections for use later in the table
     // -------------------------------------------------------------------------
@@ -302,7 +303,7 @@
     // -------------------------------------------------------------------------
     CGFloat progressWidthAdjustment = 0.9f;
     NSNumber *dailySum = [_dailySums objectForKey:[NSString stringWithFormat:@"section%ldsum", (long)section]];
-    _weeklyQuantity += [dailySum doubleValue];
+    _weeklyQuantity += 0.075;// [dailySum doubleValue];
     _monthlyQuantity += [dailySum doubleValue];
     CGFloat progressWidth = ((self.view.frame.size.width * [dailySum doubleValue]) / _highestDailyConsumption) * progressWidthAdjustment;
     if (progressWidth < 1.0f) {
@@ -354,7 +355,7 @@
         [dayLabel setAlpha:0.5f];
     } else if (daysAgo == 7) {
         // Day
-        dayLabel.text = @"Last week";
+        dayLabel.text = @"Past week";
 
         // Shots
         NSString *amountString = [NSString stringWithFormat:@"%d Shots",/*◉*/
