@@ -22,6 +22,9 @@
 @property (weak, nonatomic) IBOutlet UIVisualEffectView *addServingVisualEffectView;
 @property (weak, nonatomic) IBOutlet UIImageView *scaleImageView;
 @property (weak, nonatomic) IBOutlet UICollectionView *scaleCollectionView;
+@property (weak, nonatomic) IBOutlet UILabel *welcomeLabel;
+@property (weak, nonatomic) IBOutlet UILabel *tip1Label;
+@property (weak, nonatomic) IBOutlet UILabel *tip2Label;
 @property (strong, nonatomic) NSMutableArray* samples;
 @property (strong, nonatomic) NSMutableDictionary* groupedSamples;
 @property (strong, nonatomic) NSMutableDictionary* dailySums;
@@ -148,6 +151,7 @@
             [_groupedSamples removeAllObjects];
             [_dailySums removeAllObjects];
             [_tableView reloadData];
+            [self manageWelcomeMessageVisibility];
         });
     }];
 }
@@ -211,6 +215,14 @@
     [_addCoffeeButton setAttributedTitle:attString forState:UIControlStateNormal];
     [[_addCoffeeButton titleLabel] setNumberOfLines:0];
     [[_addCoffeeButton titleLabel] setLineBreakMode:NSLineBreakByWordWrapping];
+}
+
+- (void)manageWelcomeMessageVisibility {
+    if (_samples.count > 0) {
+        _welcomeLabel.hidden = YES;
+        _tip1Label.hidden = YES;
+        _tip2Label.hidden = YES;
+    }
 }
 
 
@@ -698,6 +710,7 @@
         dispatch_async(dispatch_get_main_queue(), ^{
             if (!error) {
                 [weakSelf.samples insertObject:sample atIndex:0];
+                [weakSelf manageWelcomeMessageVisibility];
                 [weakSelf.tableView reloadData];
                 NSLog(@"HK updated");
             } else {
