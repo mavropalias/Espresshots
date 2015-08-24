@@ -715,7 +715,11 @@
             if (!error) {
                 [weakSelf.samples insertObject:sample atIndex:0];
                 [weakSelf manageWelcomeMessageVisibility];
-                [weakSelf.tableView reloadData];
+
+                NSIndexPath *indexPath = [NSIndexPath indexPathForRow:0 inSection:[weakSelf.tableView numberOfSections] - 1];
+                [weakSelf.tableView beginUpdates];
+                [weakSelf.tableView insertRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+                [weakSelf.tableView endUpdates];
                 NSLog(@"HK updated");
             } else {
                 NSLog([NSString stringWithFormat:@"Error: %@", error]);
