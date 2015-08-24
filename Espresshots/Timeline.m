@@ -222,6 +222,10 @@
         _welcomeLabel.hidden = YES;
         _tip1Label.hidden = YES;
         _tip2Label.hidden = YES;
+    } else {
+        _welcomeLabel.hidden = NO;
+        _tip1Label.hidden = NO;
+        _tip2Label.hidden = NO;
     }
 }
 
@@ -725,7 +729,11 @@
     [_samples removeObject:sample];
     
     // Remove row from table
-    [_tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+    if (_samples.count > 0) {
+        [_tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+    } else {
+        [self manageWelcomeMessageVisibility];
+    }
     
     __unsafe_unretained typeof(self) weakSelf = self;
     [_app deleteSample:sample completion:^(BOOL success, NSError *error) {

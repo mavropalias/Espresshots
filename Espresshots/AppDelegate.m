@@ -26,7 +26,7 @@
 #pragma mark - Application
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    [application setStatusBarHidden:YES];
+    //[application setStatusBarHidden:YES];
 
     [self initApp];
 
