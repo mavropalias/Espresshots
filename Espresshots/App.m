@@ -236,4 +236,79 @@
     [navigationBar sendSubviewToBack:visualEffectView];
 }
 
+
+
+
+
+#pragma mark - Helpers
+
+- (NSDictionary *)dictionaryFromSamples:(NSArray *)samples {
+    if (!(samples.count > 0)) { return nil; }
+
+    NSMutableDictionary *samplesDictionary = [[NSMutableDictionary alloc] init];
+
+    double highestSampleConsumption = 0.0;
+    double highestDailyConsumption = 0.0;
+    double dailyConsumption = 0.0;
+
+    for (HKQuantitySample *sample in samples) {
+        // META – Update highest sample consumption
+        if ([sample.quantity doubleValueForUnit:[HKUnit unitFromString:@"g"]] > highestSampleConsumption) {
+            highestSampleConsumption = [sample.quantity doubleValueForUnit:[HKUnit unitFromString:@"g"]];
+        }
+
+        // Get sample's date
+        NSString *sampleDateString = [self humanReadableStringFromDate:sample.startDate];
+
+        // Get dictionary array for sample's date
+        NSMutableArray *dicArracy;
+        if ([samplesDictionary objectForKey:sampleDateString]) {
+            dicArracy = [samplesDictionary objectForKey:sampleDateString];
+            [dicArracy insertObject:sample atIndex:dicArracy.count];
+        } else {
+            dicArracy = [@[sample] mutableCopy];;
+        }
+
+        // Assign the updated/new sample array to the samples dictionary
+        [samplesDictionary setValue:dicArracy forKey:sampleDateString];
+
+    }
+
+    // Debug samplesDictionary
+    for( NSString *aKey in [samplesDictionary allKeys] )
+    {
+        NSLog(aKey);
+    }
+
+    return samplesDictionary;
+}
+
+- (NSString *)humanReadableStringFromDate:(NSDate *)date {
+    NSString *returnDateString = @"";
+    NSCalendar *calendar = [NSCalendar currentCalendar];
+    NSDateComponents *components = [calendar components:NSCalendarUnitDay
+                                               fromDate:date
+                                                 toDate:[NSDate date] options:0];
+    NSInteger daysAgo = [components day] + 1;
+
+    if ([[NSCalendar currentCalendar] isDateInToday:date]) {
+        returnDateString = @"Today";
+    } else if ([[NSCalendar currentCalendar] isDateInYesterday:date]) {
+        returnDateString = @"Yesterday";
+    } else if (daysAgo == 7) {
+        returnDateString = @"1 week ago";
+    } else if (daysAgo == 14) {
+        returnDateString = @"2 weeks ago";
+    } else if (daysAgo == 21) {
+        returnDateString = @"3 weeks ago";
+    } else {
+        NSDateFormatter* theDateFormatter = [[NSDateFormatter alloc] init];
+        [theDateFormatter setFormatterBehavior:NSDateFormatterBehaviorDefault];
+        [theDateFormatter setDateFormat:@"EEEE d/MMM"];
+        returnDateString = [theDateFormatter stringFromDate:date];
+    }
+
+    return returnDateString;
+}
+
 @end

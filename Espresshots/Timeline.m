@@ -148,6 +148,7 @@
     [_app fetchSamplesForType:caffeineConsumedType unit:[HKUnit gramUnit] days:51 completion:^(NSArray *samples, NSError *error) {
         dispatch_async(dispatch_get_main_queue(), ^{
             _samples = [samples mutableCopy];
+            [_app dictionaryFromSamples:samples];
             [_groupedSamples removeAllObjects];
             [_dailySums removeAllObjects];
             [_tableView reloadData];

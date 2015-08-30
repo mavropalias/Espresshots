@@ -22,5 +22,6 @@
 - (void)fetchSamplesForType:(HKQuantityType *)quantityType unit:(HKUnit *)unit days:(int)days completion:(void (^)(NSArray *, NSError *))completionHandler;
 - (void)addQuantity:(double)quantityMg completion:(void (^)(HKQuantitySample *, NSError *))completionHandler;
 - (void)deleteSample:(HKQuantitySample *)sample completion:(void (^)(BOOL, NSError *))completionHandler;
+- (NSDictionary *)dictionaryFromSamples:(NSMutableArray *)samples;
 
 @end
