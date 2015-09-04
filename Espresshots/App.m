@@ -251,6 +251,11 @@
     double highestDailyConsumption = 0.0;
     double dailyConsumption = 0.0;
 
+    NSDateFormatter* theDateFormatter = [[NSDateFormatter alloc] init];
+    [theDateFormatter setFormatterBehavior:NSDateFormatterBehaviorDefault];
+    [theDateFormatter setDateFormat:@"yyyyMMdd"];
+
+    // Parse _samples_ and put them in _samplesDictionary_, grouped by date
     for (HKQuantitySample *sample in samples) {
         // META – Update highest sample consumption
         if ([sample.quantity doubleValueForUnit:[HKUnit unitFromString:@"g"]] > highestSampleConsumption) {
@@ -258,27 +263,32 @@
         }
 
         // Get sample's date
-        NSString *sampleDateString = [self humanReadableStringFromDate:sample.startDate];
+        NSString *sampleDateString = [theDateFormatter stringFromDate:sample.startDate];
 
-        // Get dictionary array for sample's date
+        // Get dictionary for sample's date
         NSMutableArray *dicArracy;
+        NSMutableDictionary *dateDictionary = [[NSMutableDictionary alloc] init];
         if ([samplesDictionary objectForKey:sampleDateString]) {
-            dicArracy = [samplesDictionary objectForKey:sampleDateString];
-            [dicArracy insertObject:sample atIndex:dicArracy.count];
+            dateDictionary = [samplesDictionary objectForKey:sampleDateString];
         } else {
-            dicArracy = [@[sample] mutableCopy];;
+            [dateDictionary setValue:[self humanReadableStringFromDate:sample.startDate] forKey:@"date"];
         }
 
-        // Assign the updated/new sample array to the samples dictionary
-        [samplesDictionary setValue:dicArracy forKey:sampleDateString];
+            // Update samples array
+            dicArracy = [dateDictionary objectForKey:@"samples"];
+            [dicArracy insertObject:sample atIndex:dicArracy.count];
+            [dateDictionary setValue:dicArracy forKey:@"samples"];
+
+
+
+
+        // Assign the updated/new dateDictionary to the samplesDictionary master list
+        [samplesDictionary setValue:dateDictionary forKey:sampleDateString];
 
     }
 
-    // Debug samplesDictionary
-    for( NSString *aKey in [samplesDictionary allKeys] )
-    {
-        NSLog(aKey);
-    }
+
+    NSLog(@"Created NSDictionary for %lu days", (unsigned long)samplesDictionary.count);
 
     return samplesDictionary;
 }
