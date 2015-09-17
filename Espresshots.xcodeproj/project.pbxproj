@@ -9,13 +9,13 @@
 /* Begin PBXBuildFile section */
 		2E3AD7311B0F704B00001563 /* TimelineHeaderView.m in Sources */ = {isa = PBXBuildFile; fileRef = 2E3AD7301B0F704B00001563 /* TimelineHeaderView.m */; };
 		2E402EF91B1297EE001B4427 /* ScaleCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 2E402EF81B1297EE001B4427 /* ScaleCollectionViewCell.m */; };
+		2E4442C91BAAF4A900EAB156 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2E4442C81BAAF4A900EAB156 /* LaunchScreen.storyboard */; };
 		2E4A53821A92030A00972715 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 2E4A53811A92030A00972715 /* main.m */; };
 		2E4A53851A92030A00972715 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 2E4A53841A92030A00972715 /* AppDelegate.m */; };
 		2E4A53881A92030A00972715 /* Timeline.m in Sources */ = {isa = PBXBuildFile; fileRef = 2E4A53871A92030A00972715 /* Timeline.m */; };
 		2E4A538B1A92030A00972715 /* SecondViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2E4A538A1A92030A00972715 /* SecondViewController.m */; };
 		2E4A538E1A92030A00972715 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2E4A538C1A92030A00972715 /* Main.storyboard */; };
 		2E4A53901A92030A00972715 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2E4A538F1A92030A00972715 /* Images.xcassets */; };
-		2E4A53931A92030A00972715 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2E4A53911A92030A00972715 /* LaunchScreen.xib */; };
 		2E4A539F1A92030A00972715 /* EspresshotsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 2E4A539E1A92030A00972715 /* EspresshotsTests.m */; };
 		2E4A53A91A920A3900972715 /* HealthKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2E4A53A81A920A3900972715 /* HealthKit.framework */; };
 		2E4A53AD1A920DC000972715 /* App.m in Sources */ = {isa = PBXBuildFile; fileRef = 2E4A53AC1A920DC000972715 /* App.m */; };
@@ -36,6 +36,7 @@
 		2E3AD7301B0F704B00001563 /* TimelineHeaderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TimelineHeaderView.m; sourceTree = "<group>"; };
 		2E402EF71B1297EE001B4427 /* ScaleCollectionViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScaleCollectionViewCell.h; sourceTree = "<group>"; };
 		2E402EF81B1297EE001B4427 /* ScaleCollectionViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScaleCollectionViewCell.m; sourceTree = "<group>"; };
+		2E4442C81BAAF4A900EAB156 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		2E4A537C1A92030A00972715 /* Espresshots.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Espresshots.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2E4A53801A92030A00972715 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		2E4A53811A92030A00972715 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -47,7 +48,6 @@
 		2E4A538A1A92030A00972715 /* SecondViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SecondViewController.m; sourceTree = "<group>"; };
 		2E4A538D1A92030A00972715 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		2E4A538F1A92030A00972715 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
-		2E4A53921A92030A00972715 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
 		2E4A53981A92030A00972715 /* EspresshotsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EspresshotsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		2E4A539D1A92030A00972715 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		2E4A539E1A92030A00972715 /* EspresshotsTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = EspresshotsTests.m; sourceTree = "<group>"; };
@@ -94,8 +94,8 @@
 		2E3AA1431A922EA400265BB9 /* Storyboards */ = {
 			isa = PBXGroup;
 			children = (
-				2E4A53911A92030A00972715 /* LaunchScreen.xib */,
 				2E4A538C1A92030A00972715 /* Main.storyboard */,
+				2E4442C81BAAF4A900EAB156 /* LaunchScreen.storyboard */,
 			);
 			name = Storyboards;
 			sourceTree = "<group>";
@@ -248,7 +248,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				2E4A538E1A92030A00972715 /* Main.storyboard in Resources */,
-				2E4A53931A92030A00972715 /* LaunchScreen.xib in Resources */,
+				2E4442C91BAAF4A900EAB156 /* LaunchScreen.storyboard in Resources */,
 				2E4A53901A92030A00972715 /* Images.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -302,14 +302,6 @@
 				2E4A538D1A92030A00972715 /* Base */,
 			);
 			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
-		2E4A53911A92030A00972715 /* LaunchScreen.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				2E4A53921A92030A00972715 /* Base */,
-			);
-			name = LaunchScreen.xib;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */

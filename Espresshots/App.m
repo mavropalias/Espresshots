@@ -218,28 +218,6 @@
 
 
 
-#pragma mark - Visual effects
-
-- (void)addBlurEffectToNavigationBar:(UINavigationBar *)navigationBar {
-
-    navigationBar.barTintColor = [UIColor colorWithRed:(0.0f/255.0f) green:(250.0f/255.0f) blue:(250.0f/255.0f) alpha:1.0f];
-    [navigationBar setBackgroundImage:[[UIImage alloc] init] forBarMetrics:UIBarMetricsDefault];
-    navigationBar.shadowImage = [[UIImage alloc] init];
-    navigationBar.translucent = YES;
-    
-    CGRect navBounds = navigationBar.bounds;
-    CGRect bounds = CGRectMake(0, -20, navBounds.size.width , navBounds.size.height + 20);
-    UIVisualEffectView *visualEffectView = [[UIVisualEffectView alloc] initWithEffect:[UIBlurEffect effectWithStyle:UIBlurEffectStyleLight]];
-    visualEffectView.frame = bounds;
-    visualEffectView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-    [navigationBar addSubview:visualEffectView];
-    [navigationBar sendSubviewToBack:visualEffectView];
-}
-
-
-
-
-
 #pragma mark - Helpers
 
 // Create the following dictionary structure:
@@ -330,24 +308,74 @@
                                                  toDate:[NSDate date] options:0];
     NSInteger daysAgo = [components day] + 1;
 
+    NSDateFormatter *monthDayFormat = [[NSDateFormatter alloc] init];
+    [monthDayFormat setDateFormat:@"d"];
+    NSInteger day = [[monthDayFormat stringFromDate:date] intValue];
+
     if ([[NSCalendar currentCalendar] isDateInToday:date]) {
         returnDateString = @"Today";
+    } else if (day == 1) {
+        NSDateFormatter* theDateFormatter = [[NSDateFormatter alloc] init];
+        [theDateFormatter setFormatterBehavior:NSDateFormatterBehaviorDefault];
+        [theDateFormatter setDateFormat:@"MMMM"];
+        returnDateString = [NSString stringWithFormat:@"%@⇣", [theDateFormatter stringFromDate:date]];
     } else if ([[NSCalendar currentCalendar] isDateInYesterday:date]) {
         returnDateString = @"Yesterday";
-    } else if (daysAgo == 7) {
-        returnDateString = @"1 week ago";
+    } else if (daysAgo < 7) {
+        NSDateFormatter* theDateFormatter = [[NSDateFormatter alloc] init];
+        [theDateFormatter setFormatterBehavior:NSDateFormatterBehaviorDefault];
+        [theDateFormatter setDateFormat:@"EEEE"];
+        returnDateString = [theDateFormatter stringFromDate:date];
     } else if (daysAgo == 14) {
         returnDateString = @"2 weeks ago";
     } else if (daysAgo == 21) {
         returnDateString = @"3 weeks ago";
     } else {
-        NSDateFormatter* theDateFormatter = [[NSDateFormatter alloc] init];
-        [theDateFormatter setFormatterBehavior:NSDateFormatterBehaviorDefault];
-        [theDateFormatter setDateFormat:@"EEEE d/MMM"];
-        returnDateString = [theDateFormatter stringFromDate:date];
+//        NSDateFormatter* theDateFormatter = [[NSDateFormatter alloc] init];
+//        [theDateFormatter setFormatterBehavior:NSDateFormatterBehaviorDefault];
+//        [theDateFormatter setDateFormat:@"EEEE d/MMM"];
+        returnDateString = @"";
     }
 
+    //[NSDateFormatter localizedStringFromDate:date dateStyle:NSDateFormatterShortStyle timeStyle:NSDateFormatterNoStyle];
+
     return returnDateString;
+}
+
+- (UIColor*)colorWithHex:(NSString*)hex
+{
+    NSString *cString = [[hex stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] uppercaseString];
+
+    // String should be 6 or 8 characters
+    if ([cString length] < 6) return [UIColor grayColor];
+
+    // strip # if it appears
+    if ([cString hasPrefix:@"#"]) cString = [cString substringFromIndex:1];
+
+    if ([cString length] != 6) return  [UIColor grayColor];
+
+    // Separate into r, g, b substrings
+    NSRange range;
+    range.location = 0;
+    range.length = 2;
+    NSString *rString = [cString substringWithRange:range];
+
+    range.location = 2;
+    NSString *gString = [cString substringWithRange:range];
+
+    range.location = 4;
+    NSString *bString = [cString substringWithRange:range];
+
+    // Scan values
+    unsigned int r, g, b;
+    [[NSScanner scannerWithString:rString] scanHexInt:&r];
+    [[NSScanner scannerWithString:gString] scanHexInt:&g];
+    [[NSScanner scannerWithString:bString] scanHexInt:&b];
+
+    return [UIColor colorWithRed:((float) r / 255.0f)
+                           green:((float) g / 255.0f)
+                            blue:((float) b / 255.0f)
+                           alpha:1.0f];
 }
 
 @end

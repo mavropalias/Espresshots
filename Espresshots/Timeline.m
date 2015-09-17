@@ -15,12 +15,8 @@
 @property (strong, nonatomic) App* app;
 @property (weak, nonatomic) IBOutlet UITableView* tableView;
 @property (weak, nonatomic) IBOutlet UIButton *addCoffeeButton;
-@property (weak, nonatomic) IBOutlet UIVisualEffectView *addCoffeeVisualEffectView;
 @property (weak, nonatomic) IBOutlet UIButton *removeServingButton;
-@property (weak, nonatomic) IBOutlet UIVisualEffectView *removeServingVisualEffectView;
 @property (weak, nonatomic) IBOutlet UIButton *addServingButton;
-@property (weak, nonatomic) IBOutlet UIVisualEffectView *addServingVisualEffectView;
-@property (weak, nonatomic) IBOutlet UIImageView *scaleImageView;
 @property (weak, nonatomic) IBOutlet UICollectionView *scaleCollectionView;
 @property (weak, nonatomic) IBOutlet UILabel *welcomeLabel;
 @property (weak, nonatomic) IBOutlet UILabel *tip1Label;
@@ -42,6 +38,13 @@
 @property int labelInterval;
 @property int minorStepInterval;
 @property int majorStepInterval;
+
+// UI Theme
+@property (strong, nonatomic) UIColor *bgColor;
+@property (strong, nonatomic) UIColor *tintColor;
+@property (strong, nonatomic) UIColor *dailyProgressBarColor;
+@property (strong, nonatomic) UIColor *dailyTextColor;
+@property (strong, nonatomic) UIColor *sampleTextColor;
 
 - (IBAction)pinchOnView:(UIPinchGestureRecognizer *)sender;
 - (IBAction)addCustomAmount:(id)sender;
@@ -95,16 +98,19 @@
     _labelInterval = 10;
 
     // style button bgs
-    _addCoffeeVisualEffectView.layer.cornerRadius = _addCoffeeVisualEffectView.frame.size.height / 2;
-    _addCoffeeVisualEffectView.layer.masksToBounds = YES;
+    _addCoffeeButton.layer.cornerRadius = _addCoffeeButton.frame.size.height / 2;
+    _addCoffeeButton.layer.masksToBounds = YES;
 
-    _addServingVisualEffectView.layer.cornerRadius = _addServingVisualEffectView.frame.size.height / 2;
-    _addServingVisualEffectView.layer.masksToBounds = YES;
+    _addServingButton.layer.cornerRadius = _addServingButton.frame.size.height / 2;
+    _addServingButton.layer.masksToBounds = YES;
 
-    _removeServingVisualEffectView.layer.cornerRadius = _removeServingVisualEffectView.frame.size.height / 2;
-    _removeServingVisualEffectView.layer.masksToBounds = YES;
+    _removeServingButton.layer.cornerRadius = _removeServingButton.frame.size.height / 2;
+    _removeServingButton.layer.masksToBounds = YES;
 
-    [_app addBlurEffectToNavigationBar:self.navigationController.navigationBar];
+    //[_app addBlurEffectToNavigationBar:self.navigationController.navigationBar];
+    [self manageWelcomeMessageVisibility];
+    [self getTheme];
+    [self applyTheme];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -156,7 +162,7 @@
 - (void)refreshStatistics {
     HKQuantityType *caffeineConsumedType = [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierDietaryCaffeine];
     
-    [_app fetchSamplesForType:caffeineConsumedType unit:[HKUnit gramUnit] days:51 completion:^(NSArray *samples, NSError *error) {
+    [_app fetchSamplesForType:caffeineConsumedType unit:[HKUnit gramUnit] days:180 completion:^(NSArray *samples, NSError *error) {
         dispatch_async(dispatch_get_main_queue(), ^{
             _samples = [[_app dictionaryFromSamples:samples] mutableCopy];
 
@@ -246,6 +252,23 @@
     }
 }
 
+- (void)getTheme {
+    _bgColor = [_app colorWithHex:@"000000"];
+    _tintColor = [_app colorWithHex:@"A7C2A1"];
+    _dailyProgressBarColor = [_app colorWithHex:@"2C171E"];
+    _dailyTextColor = [_app colorWithHex:@"DECDAF"];
+    _sampleTextColor = [_app colorWithHex:@"DECDAF"];
+}
+
+- (void)applyTheme {
+    self.view.backgroundColor = _bgColor;
+    self.view.window.tintColor = _tintColor;
+    self.navigationController.navigationBar.tintColor = _tintColor;
+    _addCoffeeButton.backgroundColor = _tintColor;
+    _addServingButton.backgroundColor = _tintColor;
+    _removeServingButton.backgroundColor = _tintColor;
+}
+
 
 
 
@@ -261,8 +284,7 @@
 // heightForHeaderInSection
 // =============================================================================
 -(CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
-    if (_compactTableMode) return 27.0f;
-    else return 60.0f;
+    return 44.0f;
 }
 
 // viewForHeaderInSection
@@ -275,6 +297,8 @@
     
     // Set quantity bar
     // -------------------------------------------------------------------------
+    UIView *barView = (UIView *)[headerView viewWithTag:2];
+    barView.backgroundColor = _dailyProgressBarColor;
     CGFloat progressWidthAdjustment = 0.9f;
     NSNumber *dailySum = [dateDictionary objectForKey:@"dailySum"];
     _weeklyQuantity += [dailySum doubleValue]; // TODO: change the way we calculate weekly sum
@@ -293,10 +317,12 @@
     UILabel *dayLabel = (UILabel *)[headerView viewWithTag:3];
 
     dayLabel.text = [dateDictionary objectForKey:@"date"];
+    dayLabel.textColor = _dailyTextColor;
 
     NSNumber *shots = @(ceil(([dailySum doubleValue] * 1000) / _app.defaultEspressoShotMg));
     NSString *amountString = [NSString stringWithFormat:@"%@ Shots",/*◉*/ shots];
     shotsLabel.text = [NSString stringWithFormat:@"%@", amountString];
+    shotsLabel.textColor = _dailyTextColor;
 
     [shotsLabel setAlpha:1.0f];
     [dayLabel setAlpha:1.0f];
@@ -344,6 +370,7 @@
     [timeFormatter setDateFormat:@"HH:mm"];
     NSString *time =  [timeFormatter stringFromDate:sample.startDate];
     detailText.text = [NSString stringWithFormat:@"%@",time];
+    detailText.textColor = _sampleTextColor;
     
     // Set title text
     NSString *shotsText;
@@ -362,6 +389,7 @@
     cellText.text = [NSString stringWithFormat:@"%@ %@",
                      shotsText,
                      extraInfo];
+    cellText.textColor = _sampleTextColor;
 
     return cell;
 }
@@ -428,6 +456,10 @@
     } else {
         cell.lineWidthConstraint.constant = 1;
     }
+
+    // apply theme
+    cell.line.backgroundColor = _sampleTextColor;
+    cell.lineLabel.textColor = _sampleTextColor;
 
 
 
@@ -623,7 +655,7 @@
                 [weakSelf refreshStatistics];
                 NSLog(@"HK updated");
             } else {
-                NSLog([NSString stringWithFormat:@"Error: %@", error.description]);
+                NSLog(@"Error: %@", error.description);
             }
         });
     }];

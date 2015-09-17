@@ -44,7 +44,8 @@
 }
 
 - (void)applicationWillEnterForeground:(UIApplication *)application {
-    Timeline *rootController = (Timeline *)[self.window rootViewController];
+    UINavigationController *navController = (UINavigationController *)[self.window rootViewController];
+    Timeline *rootController = (Timeline *)[navController topViewController];
     [rootController refreshStatistics];
 }
 
@@ -65,7 +66,8 @@
 - (void)initApp {
     _app = [[App alloc] init];
     
-    Timeline *rootController = (Timeline *)[self.window rootViewController];
+    UINavigationController *navController = (UINavigationController *)[self.window rootViewController];
+    Timeline *rootController = (Timeline *)[navController topViewController];
     [rootController setApp:_app];
 }
 
