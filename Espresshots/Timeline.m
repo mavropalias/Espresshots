@@ -603,19 +603,22 @@
             if (!error) {
                 
                 NSString *sampleKey = [weakSelf.samplesDictionaryKeysOrderedByDate objectAtIndex:(_samplesDictionaryKeysOrderedByDate.count-1)];
-                NSMutableDictionary *dateDictionary = [weakSelf.samples objectForKey:sampleKey];
-                NSMutableArray *sectionSamples = [dateDictionary objectForKey:@"samples"];
-                if (sectionSamples == nil) {
-                    sectionSamples = [@[] mutableCopy];
+
+                if (sampleKey) {
+                    NSMutableDictionary *dateDictionary = [weakSelf.samples objectForKey:sampleKey];
+                    NSMutableArray *sectionSamples = [dateDictionary objectForKey:@"samples"];
+                    if (sectionSamples == nil) {
+                        sectionSamples = [@[] mutableCopy];
+                    }
+
+                    [sectionSamples addObject:sample];
+                    [weakSelf manageWelcomeMessageVisibility];
+
+                    NSIndexPath *indexPath = [NSIndexPath indexPathForRow:0 inSection:[weakSelf.tableView numberOfSections] - 1];
+                    [weakSelf.tableView beginUpdates];
+                    [weakSelf.tableView insertRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+                    [weakSelf.tableView endUpdates];
                 }
-
-                [sectionSamples addObject:sample];
-                [weakSelf manageWelcomeMessageVisibility];
-
-                NSIndexPath *indexPath = [NSIndexPath indexPathForRow:0 inSection:[weakSelf.tableView numberOfSections] - 1];
-                [weakSelf.tableView beginUpdates];
-                [weakSelf.tableView insertRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
-                [weakSelf.tableView endUpdates];
 
                 [weakSelf refreshStatistics];
                 NSLog(@"HK updated");
