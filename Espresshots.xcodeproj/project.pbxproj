@@ -19,6 +19,7 @@
 		2E4A539F1A92030A00972715 /* EspresshotsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 2E4A539E1A92030A00972715 /* EspresshotsTests.m */; };
 		2E4A53A91A920A3900972715 /* HealthKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2E4A53A81A920A3900972715 /* HealthKit.framework */; };
 		2E4A53AD1A920DC000972715 /* App.m in Sources */ = {isa = PBXBuildFile; fileRef = 2E4A53AC1A920DC000972715 /* App.m */; };
+		2ED6A1101BAB5CC400C8CBD9 /* SettingsTVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 2ED6A10F1BAB5CC400C8CBD9 /* SettingsTVC.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -55,6 +56,8 @@
 		2E4A53AA1A920A3900972715 /* Espresshots.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Espresshots.entitlements; sourceTree = "<group>"; };
 		2E4A53AB1A920DC000972715 /* App.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = App.h; sourceTree = "<group>"; };
 		2E4A53AC1A920DC000972715 /* App.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = App.m; sourceTree = "<group>"; };
+		2ED6A10E1BAB5CC400C8CBD9 /* SettingsTVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SettingsTVC.h; sourceTree = "<group>"; };
+		2ED6A10F1BAB5CC400C8CBD9 /* SettingsTVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SettingsTVC.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -85,6 +88,8 @@
 				2E4A538A1A92030A00972715 /* SecondViewController.m */,
 				2E4A53861A92030A00972715 /* Timeline.h */,
 				2E4A53871A92030A00972715 /* Timeline.m */,
+				2ED6A10E1BAB5CC400C8CBD9 /* SettingsTVC.h */,
+				2ED6A10F1BAB5CC400C8CBD9 /* SettingsTVC.m */,
 				2E3AD72F1B0F704B00001563 /* TimelineHeaderView.h */,
 				2E3AD7301B0F704B00001563 /* TimelineHeaderView.m */,
 			);
@@ -273,6 +278,7 @@
 				2E402EF91B1297EE001B4427 /* ScaleCollectionViewCell.m in Sources */,
 				2E4A53AD1A920DC000972715 /* App.m in Sources */,
 				2E4A53881A92030A00972715 /* Timeline.m in Sources */,
+				2ED6A1101BAB5CC400C8CBD9 /* SettingsTVC.m in Sources */,
 				2E4A53821A92030A00972715 /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

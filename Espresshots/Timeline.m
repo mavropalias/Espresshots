@@ -69,6 +69,8 @@
     // initial values
     _shouldScrollToLastRow = YES;
     _compactTableMode = true;
+    _tableView.scrollsToTop = YES;
+    _scaleCollectionView.scrollsToTop = NO;
 
     _samples = [[_app dictionaryFromSamples:_app.samples] mutableCopy];
 
