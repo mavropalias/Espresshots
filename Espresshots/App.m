@@ -242,14 +242,22 @@
 
 #pragma mark - Helpers
 
+// Create the following dictionary structure:
+//    – {samplesDictionary}
+//        – * highestSampleEntry
+//        – * highestOverallConsumptionInOneDay
+//        – {dates dictionary}
+//          – {dateSum dictionary}
+//          – {dateSum dictionary}
+//              – [samples]
+//              – * dailySum
 - (NSDictionary *)dictionaryFromSamples:(NSArray *)samples {
     if (!(samples.count > 0)) { return nil; }
 
     NSMutableDictionary *samplesDictionary = [[NSMutableDictionary alloc] init];
 
-    double highestSampleConsumption = 0.0;
-    double highestDailyConsumption = 0.0;
-    double dailyConsumption = 0.0;
+    double highestSampleEntry = 0.0;
+    double highestOverallConsumptionInOneDay = 0.0;
 
     NSDateFormatter* theDateFormatter = [[NSDateFormatter alloc] init];
     [theDateFormatter setFormatterBehavior:NSDateFormatterBehaviorDefault];
@@ -257,9 +265,10 @@
 
     // Parse _samples_ and put them in _samplesDictionary_, grouped by date
     for (HKQuantitySample *sample in samples) {
-        // META – Update highest sample consumption
-        if ([sample.quantity doubleValueForUnit:[HKUnit unitFromString:@"g"]] > highestSampleConsumption) {
-            highestSampleConsumption = [sample.quantity doubleValueForUnit:[HKUnit unitFromString:@"g"]];
+        // META – Update highestSampleEntry
+        if ([sample.quantity doubleValueForUnit:[HKUnit unitFromString:@"g"]] > highestSampleEntry) {
+            highestSampleEntry = [sample.quantity doubleValueForUnit:[HKUnit unitFromString:@"g"]];
+            [samplesDictionary setValue:[NSNumber numberWithDouble:highestSampleEntry] forKey:@"highestSampleEntry"];
         }
 
         // Get sample's date
@@ -276,16 +285,36 @@
 
             // Update samples array
             dicArracy = [dateDictionary objectForKey:@"samples"];
+            if (dicArracy == nil) {
+                dicArracy = [@[] mutableCopy];
+            }
             [dicArracy insertObject:sample atIndex:dicArracy.count];
             [dateDictionary setValue:dicArracy forKey:@"samples"];
 
+            // Calculate daily sum
+            double currentDailySum = [[dateDictionary valueForKey:@"dailySum"] doubleValue];
+            double sampleValue = [sample.quantity doubleValueForUnit:[HKUnit unitFromString:@"g"]];
+            double newDailySum = currentDailySum + sampleValue;
+            [dateDictionary setValue:[NSNumber numberWithDouble:newDailySum] forKey:@"dailySum"];
 
-
+            // Update highestOverallConsumptionInOneDay
+            if (newDailySum > highestOverallConsumptionInOneDay) {
+                highestOverallConsumptionInOneDay = newDailySum;
+            }
 
         // Assign the updated/new dateDictionary to the samplesDictionary master list
+//        if ([samplesDictionary objectForKey:@"dateArray"]) {
+//            NSMutableArray *dateArray = [samplesDictionary objectForKey:"dateArray"];
+//            [dateArray addObject:dateDictionary];
+//        } else {
+//            [dateDictionary setValue:@[dateDictionary] forKey:@"dateArray"];
+//        }
         [samplesDictionary setValue:dateDictionary forKey:sampleDateString];
 
     }
+
+    // Update highestOverallConsumptionInOneDay
+    [samplesDictionary setValue:[NSNumber numberWithDouble:highestOverallConsumptionInOneDay] forKey:@"highestOverallConsumptionInOneDay"];
 
 
     NSLog(@"Created NSDictionary for %lu days", (unsigned long)samplesDictionary.count);

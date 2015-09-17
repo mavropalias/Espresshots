@@ -25,14 +25,13 @@
 @property (weak, nonatomic) IBOutlet UILabel *welcomeLabel;
 @property (weak, nonatomic) IBOutlet UILabel *tip1Label;
 @property (weak, nonatomic) IBOutlet UILabel *tip2Label;
-@property (strong, nonatomic) NSMutableArray* samples;
-@property (strong, nonatomic) NSMutableDictionary* groupedSamples;
-@property (strong, nonatomic) NSMutableDictionary* dailySums;
+@property (strong, nonatomic) NSMutableDictionary *samples;
+@property (strong, nonatomic) NSArray *samplesDictionaryKeysOrderedByDate;
 @property (nonatomic, assign) BOOL shouldScrollToLastRow;
+@property (strong, nonatomic) NSDateFormatter * theDateFormatter;
 @property BOOL compactTableMode;
 @property BOOL editingTable;
-@property double highestSampleConsumption;
-@property double highestDailyConsumption;
+@property double highestOverallConsumptionInOneDay;
 @property double userQuantity;
 @property double servingQuantity;
 @property double weeklyQuantity;
@@ -67,12 +66,24 @@
     // initial values
     _shouldScrollToLastRow = YES;
     _compactTableMode = true;
-    _samples = _app.samples;
-    _groupedSamples = [[NSMutableDictionary alloc] init];
-    _dailySums = [[NSMutableDictionary alloc] init];
-    _highestSampleConsumption = 0.0;
-    _highestDailyConsumption = 0.0;
+
+    _samples = [[_app dictionaryFromSamples:_app.samples] mutableCopy];
+
+    // Get highest consumption and remove the keys
+    NSNumber *highestConsumptionTemp = [_samples objectForKey:@"highestOverallConsumptionInOneDay"];
+    _highestOverallConsumptionInOneDay = [highestConsumptionTemp doubleValue];
+    [_samples removeObjectForKey:@"highestOverallConsumptionInOneDay"];
+    [_samples removeObjectForKey:@"highestSampleEntry"];
+
+
+    _samplesDictionaryKeysOrderedByDate = [[_samples allKeys] sortedArrayUsingSelector:@selector(compare:)];
+    _highestOverallConsumptionInOneDay = [(NSNumber *)[_samples objectForKey:@"highestOverallConsumptionInOneDay"] doubleValue];
+
     [self setAddCoffeeButtonTitle:@"One" subtitle:@"Shot"];
+
+    _theDateFormatter = [[NSDateFormatter alloc] init];
+    [_theDateFormatter setFormatterBehavior:NSDateFormatterBehaviorDefault];
+    [_theDateFormatter setDateFormat:@"yyyyMMdd"];
 
     // config values
     _minValue = 0;
@@ -147,10 +158,15 @@
     
     [_app fetchSamplesForType:caffeineConsumedType unit:[HKUnit gramUnit] days:51 completion:^(NSArray *samples, NSError *error) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            _samples = [samples mutableCopy];
-            [_app dictionaryFromSamples:samples];
-            [_groupedSamples removeAllObjects];
-            [_dailySums removeAllObjects];
+            _samples = [[_app dictionaryFromSamples:samples] mutableCopy];
+
+            // Get highest consumption and remove the keys
+            NSNumber *highestConsumptionTemp = [_samples objectForKey:@"highestOverallConsumptionInOneDay"];
+            _highestOverallConsumptionInOneDay = [highestConsumptionTemp doubleValue];
+            [_samples removeObjectForKey:@"highestOverallConsumptionInOneDay"];
+            [_samples removeObjectForKey:@"highestSampleEntry"];
+
+            _samplesDictionaryKeysOrderedByDate = [[_samples allKeys] sortedArrayUsingSelector:@selector(compare:)];
             [_tableView reloadData];
             [self manageWelcomeMessageVisibility];
         });
@@ -239,69 +255,7 @@
 // numberOfSectionsInTableView
 // =============================================================================
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    if (!(_samples.count > 0)) { return 0; }
-    NSLog(@"%lu samples", (unsigned long)_samples.count);
-
-    // Calculate the number of days since the oldest sample
-    // -------------------------------------------------------------------------
-    HKQuantitySample *oldestSample = [_samples lastObject];
-    NSDate * date1 = oldestSample.startDate;
-    NSDate * date2 = [NSDate date];
-    NSCalendar *calendar = [NSCalendar currentCalendar];
-    NSUInteger unitFlags = NSCalendarUnitDay;
-    NSDateComponents *components = [calendar components:unitFlags
-                                                fromDate:date1
-                                                  toDate:date2 options:0];
-    NSInteger days = [components day] + 1;
-
-    NSLog(@"%@ / %@ / %ld", date1, date2, (long)days);
-    
-    // Calculate individual day sections for use later in the table
-    // -------------------------------------------------------------------------
-    _highestSampleConsumption = 0.0;
-    _highestDailyConsumption = 0.0;
-    
-    for (int section = 0; section < days; section++) {
-        //NSDate *now = [NSDate date];
-        NSDate *startDate = [calendar dateByAddingUnit:NSCalendarUnitDay
-                                                 value:section
-                                                toDate:[calendar startOfDayForDate:oldestSample.startDate]
-                                               options:0];
-        NSDate *endDate = [calendar dateByAddingUnit:NSCalendarUnitDay
-                                               value:section+1
-                                              toDate:[calendar startOfDayForDate:oldestSample.startDate]
-                                             options:0];
-        
-        NSMutableArray *sectionSamples = [[NSMutableArray alloc] init];
-        double dailyConsumption = 0.0;
-        
-        for (HKQuantitySample *sample in _samples) {
-            //NSLog([NSString stringWithFormat:@"%@", sample.startDate]);
-            if ([sample.quantity doubleValueForUnit:[HKUnit unitFromString:@"g"]] > _highestSampleConsumption) {
-                _highestSampleConsumption = [sample.quantity doubleValueForUnit:[HKUnit unitFromString:@"g"]];
-            }
-            
-            if (([sample.startDate compare:startDate] == NSOrderedDescending) &&
-                ([sample.startDate compare:endDate] == NSOrderedAscending)) {
-                [sectionSamples addObject:sample];
-                dailyConsumption += [sample.quantity doubleValueForUnit:[HKUnit unitFromString:@"g"]];
-            }
-        }
-
-        // daily samples
-        [_groupedSamples setValue:sectionSamples
-                           forKey:[NSString stringWithFormat:@"section%ld", (long)section]];
-        // daily sum
-        [_dailySums setValue:[NSNumber numberWithDouble:dailyConsumption]
-                           forKey:[NSString stringWithFormat:@"section%ldsum", (long)section]];
-
-        
-        if (dailyConsumption > _highestDailyConsumption) {
-            _highestDailyConsumption = dailyConsumption;
-        }
-    }
-    
-    return days;
+    return _samples.count;
 }
 
 // heightForHeaderInSection
@@ -315,113 +269,38 @@
 // =============================================================================
 -(UIView *) tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
     TimelineHeaderView *headerView = [tableView dequeueReusableCellWithIdentifier:@"header"];
+    NSString *sampleKey = [_samplesDictionaryKeysOrderedByDate objectAtIndex:section];
+    NSMutableDictionary *dateDictionary = [_samples objectForKey:sampleKey];
+
     
     // Set quantity bar
     // -------------------------------------------------------------------------
     CGFloat progressWidthAdjustment = 0.9f;
-    NSNumber *dailySum = [_dailySums objectForKey:[NSString stringWithFormat:@"section%ldsum", (long)section]];
-    _weeklyQuantity += 0.075;// [dailySum doubleValue];
-    _monthlyQuantity += [dailySum doubleValue];
-    CGFloat progressWidth = ((self.view.frame.size.width * [dailySum doubleValue]) / _highestDailyConsumption) * progressWidthAdjustment;
+    NSNumber *dailySum = [dateDictionary objectForKey:@"dailySum"];
+    _weeklyQuantity += [dailySum doubleValue]; // TODO: change the way we calculate weekly sum
+    _monthlyQuantity += [dailySum doubleValue]; // TODO: change the way we calculate monthly sum
+    CGFloat progressWidth = 0;
+    if (_highestOverallConsumptionInOneDay > 0) progressWidth = ((self.view.frame.size.width * [dailySum doubleValue]) / _highestOverallConsumptionInOneDay) * progressWidthAdjustment;
     if (progressWidth < 1.0f) {
         progressWidth = 1.0f;
     }
     headerView.progressViewWidthConstraint.constant = progressWidth;
 
-    // Get sample
-    // -------------------------------------------------------------------------
-    NSMutableArray *sectionSamples = [_groupedSamples objectForKey:[NSString stringWithFormat:@"section%ld", (long)section]];
-    HKQuantitySample *sample;
-    if (sectionSamples.count > 0) {
-        sample = [sectionSamples objectAtIndex:0];
-    }
 
     // Day & Shots
     // -------------------------------------------------------------------------
     UILabel *shotsLabel = (UILabel *)[headerView viewWithTag:1];
     UILabel *dayLabel = (UILabel *)[headerView viewWithTag:3];
-    NSCalendar *calendar = [NSCalendar currentCalendar];
-    NSDateComponents *components = [calendar components:NSCalendarUnitDay
-                                               fromDate:sample.startDate
-                                                 toDate:[NSDate date] options:0];
-    NSInteger daysAgo = [components day] + 1;
 
-    if ([[NSCalendar currentCalendar] isDateInToday:sample.startDate]) {
-        // Day
-        dayLabel.text = @"Today";
+    dayLabel.text = [dateDictionary objectForKey:@"date"];
 
-        // Shots
-        NSString *amountString = [NSString stringWithFormat:@"%d Shots",/*◉*/
-                                  (int)(([dailySum doubleValue] * 1000) / _app.defaultEspressoShotMg)];
-        shotsLabel.text = [NSString stringWithFormat:@"%@", amountString];
+    NSNumber *shots = @(ceil(([dailySum doubleValue] * 1000) / _app.defaultEspressoShotMg));
+    NSString *amountString = [NSString stringWithFormat:@"%@ Shots",/*◉*/ shots];
+    shotsLabel.text = [NSString stringWithFormat:@"%@", amountString];
 
-        // Alpha
-        [shotsLabel setAlpha:1.0f];
-        [dayLabel setAlpha:1.0f];
-    } else if ([[NSCalendar currentCalendar] isDateInYesterday:sample.startDate]) {
-        // Day
-        dayLabel.text = @"Yesterday";
+    [shotsLabel setAlpha:1.0f];
+    [dayLabel setAlpha:1.0f];
 
-        // Shots
-        NSString *amountString = [NSString stringWithFormat:@"%d Shots",/*◉*/
-                                  (int)(([dailySum doubleValue] * 1000) / _app.defaultEspressoShotMg)];
-        shotsLabel.text = [NSString stringWithFormat:@"%@", amountString];
-
-        // Alpha
-        [shotsLabel setAlpha:0.5f];
-        [dayLabel setAlpha:0.5f];
-    } else if (daysAgo == 7) {
-        // Day
-        dayLabel.text = @"Past week";
-
-        // Shots
-        NSString *amountString = [NSString stringWithFormat:@"%d Shots",/*◉*/
-                                  (int)((_weeklyQuantity * 1000) / _app.defaultEspressoShotMg)];
-        shotsLabel.text = [NSString stringWithFormat:@"%@", amountString];
-        _weeklyQuantity = 0.0f;
-
-        // Alpha
-        [shotsLabel setAlpha:0.5f];
-        [dayLabel setAlpha:0.5f];
-    } else if (daysAgo == 14) {
-        // Day
-        dayLabel.text = @"Two weeks ago";
-
-        // Shots
-        NSString *amountString = [NSString stringWithFormat:@"%d Shots",/*◉*/
-                                  (int)((_weeklyQuantity * 1000) / _app.defaultEspressoShotMg)];
-        shotsLabel.text = [NSString stringWithFormat:@"%@", amountString];
-        _weeklyQuantity = 0.0f;
-
-        // Alpha
-        [shotsLabel setAlpha:0.5f];
-        [dayLabel setAlpha:0.5f];
-    } else if (daysAgo == 21) {
-        // Day
-        dayLabel.text = @"Three weeks ago";
-
-        // Shots
-        NSString *amountString = [NSString stringWithFormat:@"%d Shots",/*◉*/
-                                  (int)((_weeklyQuantity * 1000) / _app.defaultEspressoShotMg)];
-        shotsLabel.text = [NSString stringWithFormat:@"%@", amountString];
-        _weeklyQuantity = 0.0f;
-
-        // Alpha
-        [shotsLabel setAlpha:0.5f];
-        [dayLabel setAlpha:0.5f];
-    } else {
-//        NSDateFormatter* theDateFormatter = [[NSDateFormatter alloc] init];
-//        [theDateFormatter setFormatterBehavior:NSDateFormatterBehaviorDefault];
-//        [theDateFormatter setDateFormat:@"EE"];
-//        NSString *dateString = [theDateFormatter stringFromDate:sample.startDate];
-//        headerView.detailLabel.text = dateString;
-//        headerView.detailLabel.text = @"";
-
-        dayLabel.text = @"";
-        shotsLabel.text = @"";
-        [shotsLabel setAlpha:0.5f];
-        [dayLabel setAlpha:0.5f];
-    }
 
     if (!_compactTableMode) {
         headerView.visualEffectView.hidden = NO;
@@ -435,19 +314,23 @@
 // numberOfRowsInSection
 // =============================================================================
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    if (_compactTableMode && section < (_groupedSamples.count - 1)) return 0;
+    if (_compactTableMode && section != _samplesDictionaryKeysOrderedByDate.count - 1) return 0;
     
-    NSMutableArray *sectionArray = [_groupedSamples objectForKey:[NSString stringWithFormat:@"section%ld", (long)section]];
-    return sectionArray.count;
+    NSString *sampleKey = [_samplesDictionaryKeysOrderedByDate objectAtIndex:section];
+    NSMutableDictionary *dateDictionary = [_samples objectForKey:sampleKey];
+    NSArray *samplesArray = [dateDictionary objectForKey:@"samples"];
+    return samplesArray.count;
 }
 
 // cellForRowAtIndexPath
 // =============================================================================
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
-    
-    NSMutableArray *sectionSamples = [_groupedSamples objectForKey:[NSString stringWithFormat:@"section%ld", (long)indexPath.section]];
-    HKQuantitySample *sample = [sectionSamples objectAtIndex:((sectionSamples.count - 1) - indexPath.row)];
+
+    NSString *sampleKey = [_samplesDictionaryKeysOrderedByDate objectAtIndex:indexPath.section];
+    NSMutableDictionary *dateDictionary = [_samples objectForKey:sampleKey];
+    NSArray *samplesArray = [dateDictionary objectForKey:@"samples"];
+    HKQuantitySample *sample = [samplesArray objectAtIndex:indexPath.row];
     
     NSString *extraInfo = @"";
     if (![sample.source.bundleIdentifier isEqualToString:_app.bundleIdentifier] && sample.source.name) {
@@ -479,14 +362,16 @@
     cellText.text = [NSString stringWithFormat:@"%@ %@",
                      shotsText,
                      extraInfo];
-    
+
     return cell;
 }
 
 // canEditRowAtIndexPath
 // =============================================================================
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath{
-    NSMutableArray *sectionSamples = [_groupedSamples objectForKey:[NSString stringWithFormat:@"section%ld", (long)indexPath.section]];
+    NSString *sampleKey = [_samplesDictionaryKeysOrderedByDate objectAtIndex:indexPath.section];
+    NSMutableDictionary *dateDictionary = [_samples objectForKey:sampleKey];
+    NSMutableArray *sectionSamples = [dateDictionary objectForKey:@"samples"];
     HKQuantitySample *sample = [sectionSamples objectAtIndex:indexPath.row];
     
     if ([sample.source.bundleIdentifier isEqualToString:_app.bundleIdentifier] || !sample.source.name) return YES;
@@ -496,7 +381,9 @@
 // commitEditingStyle
 // =============================================================================
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
-    NSMutableArray *sectionSamples = [_groupedSamples objectForKey:[NSString stringWithFormat:@"section%ld", (long)indexPath.section]];
+    NSString *sampleKey = [_samplesDictionaryKeysOrderedByDate objectAtIndex:indexPath.section];
+    NSMutableDictionary *dateDictionary = [_samples objectForKey:sampleKey];
+    NSMutableArray *sectionSamples = [dateDictionary objectForKey:@"samples"];
     HKQuantitySample *sample = [sectionSamples objectAtIndex:indexPath.row];
     [self deleteSample:sample indexPath:indexPath];
 }
@@ -593,7 +480,7 @@
         if (scale > 1.0f) _compactTableMode = NO;
         else _compactTableMode = YES;
         
-        NSRange range = NSMakeRange(0, _groupedSamples.count - 1);
+        NSRange range = NSMakeRange(0, _samples.count - 1); // TODO: fix this to count all samples instead of just sections
         NSIndexSet *sections = [NSIndexSet indexSetWithIndexesInRange:range];
         [_tableView reloadSections:sections withRowAnimation:UITableViewRowAnimationAutomatic];
 
@@ -714,36 +601,45 @@
     [_app addQuantity:quantity completion:^(HKQuantitySample *sample, NSError *error) {
         dispatch_async(dispatch_get_main_queue(), ^{
             if (!error) {
-                [weakSelf.samples insertObject:sample atIndex:0];
+                
+                NSString *sampleKey = [weakSelf.samplesDictionaryKeysOrderedByDate objectAtIndex:(_samplesDictionaryKeysOrderedByDate.count-1)];
+                NSMutableDictionary *dateDictionary = [weakSelf.samples objectForKey:sampleKey];
+                NSMutableArray *sectionSamples = [dateDictionary objectForKey:@"samples"];
+                if (sectionSamples == nil) {
+                    sectionSamples = [@[] mutableCopy];
+                }
+
+                [sectionSamples addObject:sample];
                 [weakSelf manageWelcomeMessageVisibility];
 
                 NSIndexPath *indexPath = [NSIndexPath indexPathForRow:0 inSection:[weakSelf.tableView numberOfSections] - 1];
                 [weakSelf.tableView beginUpdates];
                 [weakSelf.tableView insertRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
                 [weakSelf.tableView endUpdates];
+
+                [weakSelf refreshStatistics];
                 NSLog(@"HK updated");
             } else {
-                NSLog([NSString stringWithFormat:@"Error: %@", error]);
+                NSLog([NSString stringWithFormat:@"Error: %@", error.description]);
             }
         });
     }];
 }
 
 - (void)deleteSample:(HKQuantitySample *)sample indexPath:(NSIndexPath *)indexPath {
-    // Update local array
-    [_samples removeObject:sample];
-    
-    // Remove row from table
-    if (_samples.count > 0) {
-        [_tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
-    } else {
-        [self manageWelcomeMessageVisibility];
-    }
-    
+    // Remove cell from table
+    NSString *sampleKey = [_samplesDictionaryKeysOrderedByDate objectAtIndex:indexPath.section];
+    NSMutableDictionary *dateDictionary = [_samples objectForKey:sampleKey];
+    NSMutableArray *sectionSamples = [dateDictionary objectForKey:@"samples"];
+    [sectionSamples removeObjectAtIndex:indexPath.row];
+
+    [_tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+
+    // Remove sample from HK and refreshStatistics
     __unsafe_unretained typeof(self) weakSelf = self;
     [_app deleteSample:sample completion:^(BOOL success, NSError *error) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            [weakSelf.tableView reloadData];
+            [weakSelf refreshStatistics];
             NSLog(@"HK updated");
         });
     }];
