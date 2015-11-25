@@ -215,7 +215,7 @@
 				TargetAttributes = {
 					2E4A537B1A92030A00972715 = {
 						CreatedOnToolsVersion = 6.2;
-						DevelopmentTeam = VAT7JZY796;
+						DevelopmentTeam = 38QFH693YQ;
 						SystemCapabilities = {
 							com.apple.HealthKit = {
 								enabled = 1;
@@ -402,9 +402,10 @@
 				INFOPLIST_FILE = Espresshots/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "gl.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.instasoda.espresshots;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -418,9 +419,10 @@
 				INFOPLIST_FILE = Espresshots/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "gl.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.instasoda.espresshots;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};

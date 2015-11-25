@@ -271,6 +271,26 @@
     _removeServingButton.backgroundColor = _tintColor;
 }
 
+- (void)showAlertWithTitle:(NSString *)title message:(NSString *)message {
+    UIAlertController * alert=   [UIAlertController
+                                  alertControllerWithTitle:title
+                                  message:message
+                                  preferredStyle:UIAlertControllerStyleAlert];
+    
+    UIAlertAction* button = [UIAlertAction
+                             actionWithTitle:@"Ok"
+                             style:UIAlertActionStyleDefault
+                             handler:^(UIAlertAction * action)
+                             {
+                                 //Handel your yes please button action here
+                                 [alert dismissViewControllerAnimated:YES completion:nil];
+                                 
+                             }];
+    
+    [alert addAction:button];
+    [self presentViewController:alert animated:YES completion:nil];
+}
+
 
 
 
@@ -658,6 +678,9 @@
                 NSLog(@"HK updated");
             } else {
                 NSLog(@"Error: %@", error.description);
+                if (error.code == 4) {
+                    [weakSelf showAlertWithTitle:error.localizedDescription message:@"Espresshots is not authorized to write data in HealthKit. Please enable access in the Health app's settings."];
+                }
             }
         });
     }];

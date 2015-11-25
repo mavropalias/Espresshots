@@ -100,7 +100,7 @@
         }
         else {
             NSLog(@"An error occured: %@." , error);
-            abort();
+            completionHandler(quantitySample, error);
         }
     }];
 }
