@@ -113,7 +113,7 @@
 
     //[_app addBlurEffectToNavigationBar:self.navigationController.navigationBar];
     [self manageWelcomeMessageVisibility];
-    [self getTheme];
+    [self getTheme:0];
     [self applyTheme];
 }
 
@@ -256,11 +256,46 @@
     }
 }
 
-- (void)getTheme {
+- (void)getTheme:(int)themeId {
+    // old color: 93C3CC
+    
+    // iPhone case colors:
+    // Blue: #6BC0E4
+    // Charcoal Grey: #616469
+    // Stone: #D6CFCA
+    // Turquoise: #CFDEE1
+    // Midnight Blue: #5D5E6E
+    // Lavender: #C7BCC4
+    // Pink: #FACBCC
+    // Orange: #E05C4C
+    // Red: #E11042
+    
+    // Not suitable
+    // White: #F6F4F2
+    // Antique White: #EEE8DD
+    
+    // Complementary colors from:
+    //  https://color.adobe.com/create/color-wheel/?base=0&rule=Complementary&selected=3&name=My%20Color%20Theme&mode=rgb&rgbvalues=0.8823529411764706,0.06274509803921569,0.25882352941176473,0.6823529411764706,0.5402183775470972,0.574221861668982,1,0.1711111111111111,0.36940988835740374,0,0.5823529411764705,0.08595712366374941,0.0627450980392157,0.8823529411764706,0.18372179060301122&swatchOrder=0,1,2,3,4
+    
+    NSArray *themes = @[
+                        @[@"Cyan",          @"93C3CC" , @"7F5E42"],
+                        @[@"Blue",          @"6BC0E4" , @"976429"],
+                        @[@"Charcoal Grey", @"616469" , @"B5A583"],
+                        @[@"Stone",         @"D6CFCA" , @"668689"],
+                        @[@"Turquoise",     @"CFDEE1" , @"947E6B"],
+                        @[@"Midnight Blue", @"5D5E6E" , @"BAAD78"],
+                        @[@"Lavender",      @"C7BCC4" , @"607A5B"],
+                        @[@"Pink",          @"FACBCC" , @"6AAD7C"],
+                        @[@"Orange",        @"E05C4C" , @"159353"],
+                        @[@"Red",           @"E11042" , @"009416"],
+    ];
+    
+    NSArray *currentTheme = [themes objectAtIndex:themeId];
+    
+    _tintColor = [_app colorWithHex:[currentTheme objectAtIndex:1]];
     _bgColor = [_app colorWithHex:@"000000"];
     _textOnBgColor = [_app colorWithHex:@"FF197D"];
-    _dailyProgressBarColorHighlighted = [_app colorWithHex:@"7F5E42"];
-    _tintColor = [_app colorWithHex:@"93C3CC"];
+    _dailyProgressBarColorHighlighted = [_app colorWithHex:[currentTheme objectAtIndex:2]];
     _dailyProgressBarColor = [_app colorWithHex:@"444444"];
     _dailyTextColor = [_app colorWithHex:@"bbbbbb"];
     _sampleTextColor = [_app colorWithHex:@"bbbbbb"];
