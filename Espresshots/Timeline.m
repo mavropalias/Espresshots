@@ -113,7 +113,7 @@
 
     //[_app addBlurEffectToNavigationBar:self.navigationController.navigationBar];
     [self manageWelcomeMessageVisibility];
-    [self getTheme:1];
+    [self getTheme:0];
     [self applyTheme];
 }
 
@@ -257,6 +257,7 @@
 }
 
 - (void)getTheme:(int)themeId {
+    themeId = 9;
     // old color: 93C3CC
     
     // iPhone case colors:
@@ -296,7 +297,7 @@
     _bgColor = [_app colorWithHex:@"000000"];
     _textOnBgColor = [_app colorWithHex:@"FF197D"];
     _dailyProgressBarColorHighlighted = [_app colorWithHex:[currentTheme objectAtIndex:2]];
-    _dailyProgressBarColor = [_app colorWithHex:@"222222"];
+    _dailyProgressBarColor = [_app colorWithHex:[currentTheme objectAtIndex:2]];;
     _dailyTextColor = [_app colorWithHex:@"bbbbbb"];
     _sampleTextColor = [_app colorWithHex:@"bbbbbb"];
 }
@@ -311,9 +312,10 @@
     _tip1Label.textColor = _textOnBgColor;
     _tip2Label.textColor = _textOnBgColor;
     
+    // Buttons
     _addCoffeeButton.backgroundColor = _tintColor;
-    _addServingButton.backgroundColor = _tintColor;
-    _removeServingButton.backgroundColor = _tintColor;
+    _addServingButton.backgroundColor = [_tintColor colorWithAlphaComponent:0.5f];
+    _removeServingButton.backgroundColor = [_tintColor colorWithAlphaComponent:0.5f];
 }
 
 - (void)showAlertWithTitle:(NSString *)title message:(NSString *)message {
@@ -372,7 +374,7 @@
     if ([isNewMonth intValue] != 1) {
         //barView.backgroundColor = _dailyProgressBarColor;
         CGFloat transparency = [dailySum floatValue] / _highestOverallConsumptionInOneDay;
-        barView.backgroundColor = [UIColor colorWithRed:0.5f green:0.5f blue:0.5f alpha:transparency];
+        barView.backgroundColor = [_dailyProgressBarColor colorWithAlphaComponent:transparency];
     } else {
         barView.backgroundColor = _dailyProgressBarColorHighlighted;
     }
@@ -398,7 +400,7 @@
     dayLabel.textColor = _dailyTextColor;
 
     NSNumber *shots = @(ceil(([dailySum doubleValue] * 1000) / _app.defaultEspressoShotMg));
-    NSString *amountString = [NSString stringWithFormat:@"%@ Shots",/*◉*/ shots];
+    NSString *amountString = [NSString stringWithFormat:@"%@",/*◉*/ shots];
     shotsLabel.text = [NSString stringWithFormat:@"%@", amountString];
     shotsLabel.textColor = _dailyTextColor;
 
@@ -456,7 +458,7 @@
         int shotsCount = (int)([sample.quantity doubleValueForUnit:[HKUnit unitFromString:@"mg"]] / _app.defaultEspressoShotMg);
         shotsText = [NSString stringWithFormat:@"%d %@",
                      shotsCount,
-                     (shotsCount > 1) ? @"Shots" : @"Shot"];
+                     (shotsCount > 1) ? @"" : @""];
     } else {
         shotsText = [NSString stringWithFormat:@"%d mg",
                  (int)[sample.quantity doubleValueForUnit:[HKUnit unitFromString:@"mg"]]];
