@@ -296,7 +296,7 @@
     _bgColor = [_app colorWithHex:@"000000"];
     _textOnBgColor = [_app colorWithHex:@"FF197D"];
     _dailyProgressBarColorHighlighted = [_app colorWithHex:[currentTheme objectAtIndex:2]];
-    _dailyProgressBarColor = [_app colorWithHex:@"444444"];
+    _dailyProgressBarColor = [_app colorWithHex:@"222222"];
     _dailyTextColor = [_app colorWithHex:@"bbbbbb"];
     _sampleTextColor = [_app colorWithHex:@"bbbbbb"];
 }
@@ -360,6 +360,7 @@
     TimelineHeaderView *headerView = [tableView dequeueReusableCellWithIdentifier:@"header"];
     NSString *sampleKey = [_samplesDictionaryKeysOrderedByDate objectAtIndex:section];
     NSMutableDictionary *dateDictionary = [_samples objectForKey:sampleKey];
+    NSNumber *dailySum = [dateDictionary objectForKey:@"dailySum"];
 
     
     // Sample bar
@@ -369,14 +370,15 @@
     // Highlight row, if we're starting a new month
     NSNumber *isNewMonth = [dateDictionary objectForKey:@"isNewMonth"];
     if ([isNewMonth intValue] != 1) {
-        barView.backgroundColor = _dailyProgressBarColor;
+        //barView.backgroundColor = _dailyProgressBarColor;
+        CGFloat transparency = [dailySum floatValue] / _highestOverallConsumptionInOneDay;
+        barView.backgroundColor = [UIColor colorWithRed:0.5f green:0.5f blue:0.5f alpha:transparency];
     } else {
         barView.backgroundColor = _dailyProgressBarColorHighlighted;
     }
     
     
     CGFloat progressWidthAdjustment = 0.9f;
-    NSNumber *dailySum = [dateDictionary objectForKey:@"dailySum"];
     _weeklyQuantity += [dailySum doubleValue]; // TODO: change the way we calculate weekly sum
     _monthlyQuantity += [dailySum doubleValue]; // TODO: change the way we calculate monthly sum
     CGFloat progressWidth = 0;
@@ -387,7 +389,7 @@
     headerView.progressViewWidthConstraint.constant = progressWidth;
 
 
-    // Day & Shots
+    // Day & Shots text labels
     // -------------------------------------------------------------------------
     UILabel *shotsLabel = (UILabel *)[headerView viewWithTag:1];
     UILabel *dayLabel = (UILabel *)[headerView viewWithTag:3];
