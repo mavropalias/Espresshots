@@ -456,6 +456,16 @@
     [self deleteSample:sample indexPath:indexPath];
 }
 
+// scrollViewShouldScrollToTop
+// ===========================
+- (BOOL)scrollViewShouldScrollToTop:(UIScrollView *)scrollView {
+    [self.tableView setContentOffset:CGPointMake(0,
+                                                 _tableView.contentSize.height - (self.view.frame.size.height / 2)
+                                                 )];
+    
+    return false;
+}
+
 
 
 
@@ -564,6 +574,10 @@
 - (IBAction)addTripleAmount:(id)sender { [self addAmount:_app.defaultEspressoShotMg * 3]; }
 
 - (IBAction)addCustomAmount:(id)sender {
+    [self.tableView setContentOffset:CGPointMake(0,
+                                                 _tableView.contentSize.height - (self.view.frame.size.height / 2)
+                                                 )];
+    
     [self addAmount:_userQuantity];
 }
 
