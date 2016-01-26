@@ -44,6 +44,7 @@
 @property (strong, nonatomic) UIColor *textOnBgColor;
 @property (strong, nonatomic) UIColor *tintColor;
 @property (strong, nonatomic) UIColor *dailyProgressBarColor;
+@property (strong, nonatomic) UIColor *dailyProgressBarColorHighlighted;
 @property (strong, nonatomic) UIColor *dailyTextColor;
 @property (strong, nonatomic) UIColor *sampleTextColor;
 
@@ -258,6 +259,7 @@
 - (void)getTheme {
     _bgColor = [_app colorWithHex:@"000000"];
     _textOnBgColor = [_app colorWithHex:@"FF197D"];
+    _dailyProgressBarColorHighlighted = [_app colorWithHex:@"7F5E42"];
     _tintColor = [_app colorWithHex:@"93C3CC"];
     _dailyProgressBarColor = [_app colorWithHex:@"444444"];
     _dailyTextColor = [_app colorWithHex:@"bbbbbb"];
@@ -325,10 +327,19 @@
     NSMutableDictionary *dateDictionary = [_samples objectForKey:sampleKey];
 
     
-    // Set quantity bar
+    // Sample bar
     // -------------------------------------------------------------------------
     UIView *barView = (UIView *)[headerView viewWithTag:2];
-    barView.backgroundColor = _dailyProgressBarColor;
+    
+    // Highlight row, if we're starting a new month
+    NSNumber *isNewMonth = [dateDictionary objectForKey:@"isNewMonth"];
+    if ([isNewMonth intValue] != 1) {
+        barView.backgroundColor = _dailyProgressBarColor;
+    } else {
+        barView.backgroundColor = _dailyProgressBarColorHighlighted;
+    }
+    
+    
     CGFloat progressWidthAdjustment = 0.9f;
     NSNumber *dailySum = [dateDictionary objectForKey:@"dailySum"];
     _weeklyQuantity += [dailySum doubleValue]; // TODO: change the way we calculate weekly sum
@@ -356,7 +367,6 @@
 
     [shotsLabel setAlpha:1.0f];
     [dayLabel setAlpha:1.0f];
-
 
     if (!_compactTableMode) {
         headerView.visualEffectView.hidden = NO;

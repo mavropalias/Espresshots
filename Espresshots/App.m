@@ -259,6 +259,14 @@
             dateDictionary = [samplesDictionary objectForKey:sampleDateString];
         } else {
             [dateDictionary setValue:[self humanReadableStringFromDate:sample.startDate] forKey:@"date"];
+
+            // Check if we're on the 1st of a month
+            NSDateFormatter *monthDayFormat = [[NSDateFormatter alloc] init];
+            [monthDayFormat setDateFormat:@"d"];
+            NSInteger day = [[monthDayFormat stringFromDate:sample.startDate] intValue];
+            if (day == 1) {
+                [dateDictionary setValue:@1 forKey:@"isNewMonth"];
+            }
         }
 
             // Update samples array

@@ -308,7 +308,7 @@
                             </collectionView>
                             <view alpha="0.10000000000000001" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" translatesAutoresizingMaskIntoConstraints="NO" id="gpj-ld-62x" userLabel="ruler marker (UIView)">
                                 <rect key="frame" x="159" y="64" width="1" height="476"/>
-                                <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="1" id="bhu-hT-AC5"/>
                                 </constraints>
