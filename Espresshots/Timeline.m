@@ -41,6 +41,7 @@
 
 // UI Theme
 @property (strong, nonatomic) UIColor *bgColor;
+@property (strong, nonatomic) UIColor *textOnBgColor;
 @property (strong, nonatomic) UIColor *tintColor;
 @property (strong, nonatomic) UIColor *dailyProgressBarColor;
 @property (strong, nonatomic) UIColor *dailyTextColor;
@@ -243,6 +244,7 @@
 }
 
 - (void)manageWelcomeMessageVisibility {
+    return;
     if (_samples.count > 0) {
         _welcomeLabel.hidden = YES;
         _tip1Label.hidden = YES;
@@ -256,22 +258,23 @@
 
 - (void)getTheme {
     _bgColor = [_app colorWithHex:@"000000"];
-    _tintColor = [_app colorWithHex:@"A7C2A1"];
-    _dailyProgressBarColor = [_app colorWithHex:@"2C171E"];
-    _dailyTextColor = [_app colorWithHex:@"DECDAF"];
-    _sampleTextColor = [_app colorWithHex:@"DECDAF"];
-    
-    _bgColor = [_app colorWithHex:@"000000"];
+    _textOnBgColor = [_app colorWithHex:@"FF197D"];
     _tintColor = [_app colorWithHex:@"93C3CC"];
     _dailyProgressBarColor = [_app colorWithHex:@"444444"];
-    _dailyTextColor = [_app colorWithHex:@"999999"];
-    _sampleTextColor = [_app colorWithHex:@"999999"];
+    _dailyTextColor = [_app colorWithHex:@"bbbbbb"];
+    _sampleTextColor = [_app colorWithHex:@"bbbbbb"];
 }
 
 - (void)applyTheme {
     self.view.backgroundColor = _bgColor;
     self.view.window.tintColor = _tintColor;
     self.navigationController.navigationBar.tintColor = _tintColor;
+    
+    // Welcome message
+    _welcomeLabel.textColor = _textOnBgColor;
+    _tip1Label.textColor = _textOnBgColor;
+    _tip2Label.textColor = _textOnBgColor;
+    
     _addCoffeeButton.backgroundColor = _tintColor;
     _addServingButton.backgroundColor = _tintColor;
     _removeServingButton.backgroundColor = _tintColor;
