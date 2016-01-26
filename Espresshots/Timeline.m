@@ -244,7 +244,6 @@
 }
 
 - (void)manageWelcomeMessageVisibility {
-    return;
     if (_samples.count > 0) {
         _welcomeLabel.hidden = YES;
         _tip1Label.hidden = YES;
