@@ -113,7 +113,7 @@
 
     //[_app addBlurEffectToNavigationBar:self.navigationController.navigationBar];
     [self manageWelcomeMessageVisibility];
-    [self getTheme:0];
+    [self getTheme:1];
     [self applyTheme];
 }
 
