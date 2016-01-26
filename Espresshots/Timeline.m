@@ -260,6 +260,12 @@
     _dailyProgressBarColor = [_app colorWithHex:@"2C171E"];
     _dailyTextColor = [_app colorWithHex:@"DECDAF"];
     _sampleTextColor = [_app colorWithHex:@"DECDAF"];
+    
+    _bgColor = [_app colorWithHex:@"000000"];
+    _tintColor = [_app colorWithHex:@"93C3CC"];
+    _dailyProgressBarColor = [_app colorWithHex:@"444444"];
+    _dailyTextColor = [_app colorWithHex:@"999999"];
+    _sampleTextColor = [_app colorWithHex:@"999999"];
 }
 
 - (void)applyTheme {
