@@ -257,19 +257,19 @@
 }
 
 - (void)getTheme:(int)themeId {
-    themeId = 9;
+    themeId = 8;
     // old color: 93C3CC
     
     // iPhone case colors:
-    // Blue: #6BC0E4
-    // Charcoal Grey: #616469
-    // Stone: #D6CFCA
-    // Turquoise: #CFDEE1
-    // Midnight Blue: #5D5E6E
-    // Lavender: #C7BCC4
-    // Pink: #FACBCC
-    // Orange: #E05C4C
-    // Red: #E11042
+    // 1 Blue: #6BC0E4
+    // 2 Charcoal Grey: #616469
+    // 3 Stone: #D6CFCA
+    // 4 Turquoise: #CFDEE1
+    // 5 ** Midnight Blue: #5D5E6E
+    // 6 ** Lavender: #C7BCC4
+    // 7 ** Pink: #FACBCC
+    // 8 ** Orange: #E05C4C
+    // 9 ** Red: #E11042
     
     // Not suitable
     // White: #F6F4F2
