@@ -95,7 +95,7 @@
     // config values
     _minValue = 0;
     _maxValue = 400;
-    _servingQuantity = 75.0f;
+    _servingQuantity = _app.defaultEspressoShotMg;
     _userQuantity = _servingQuantity;
     _minorStepInterval = 5;
     _majorStepInterval = _servingQuantity;
@@ -113,7 +113,7 @@
 
     //[_app addBlurEffectToNavigationBar:self.navigationController.navigationBar];
     [self manageWelcomeMessageVisibility];
-    [self getTheme:0];
+    [self getTheme:_app.currentTheme];
     [self applyTheme];
 }
 

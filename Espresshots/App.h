@@ -14,6 +14,7 @@
 
 @property BOOL healthkitAuthorised;
 @property double defaultEspressoShotMg;
+@property int currentTheme;
 @property (strong, nonatomic) NSString *bundleIdentifier;
 @property (strong, nonatomic) NSMutableArray *samples;
 

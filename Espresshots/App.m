@@ -25,7 +25,6 @@
 - (App *)init {
     _healthStore = [[HKHealthStore alloc] init];
     _samples = [[NSMutableArray alloc] init];
-    _defaultEspressoShotMg = 75.0;
     _bundleIdentifier = [[NSBundle mainBundle] bundleIdentifier];
     
     [self loadUserDefaults];
@@ -198,9 +197,20 @@
 - (void)saveUserDefaults {
     NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
     
+    // Samples
     NSData *samples = [NSKeyedArchiver archivedDataWithRootObject:_samples];
+    
+    // Shot amount
+    NSNumber *shotAmount = [NSNumber numberWithDouble:_defaultEspressoShotMg];
+    
+    // Theme
+    NSNumber *theme = [NSNumber numberWithInt:_currentTheme];
+    
+    // Save data
     NSDictionary *userData = [[NSDictionary alloc] initWithObjectsAndKeys:
                               samples, @"samples",
+                              shotAmount, @"shotAmount",
+                              theme, @"theme",
                               nil];
     [prefs setObject:userData forKey:@"userData"];
     [prefs synchronize];
@@ -209,9 +219,25 @@
 - (void)loadUserDefaults {
     NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
     
+    // Samples
     NSDictionary *userData = [[prefs dictionaryForKey:@"userData"] mutableCopy];
-    
     _samples = [NSKeyedUnarchiver unarchiveObjectWithData:userData[@"samples"]];
+    
+    // Shot amount
+    NSNumber *shotAmount = [prefs objectForKey:@"shotAmount"];
+    if (shotAmount > 0) {
+        _defaultEspressoShotMg = [shotAmount doubleValue];
+    } else {
+        _defaultEspressoShotMg = 75.0f;
+    }
+    
+    // Theme
+    NSNumber *theme = [prefs objectForKey:@"theme"];
+    if (theme > 0) {
+        _currentTheme = [theme intValue];
+    } else {
+        _currentTheme = 0;
+    }
 }
 
 
