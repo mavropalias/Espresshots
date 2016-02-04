@@ -335,6 +335,70 @@
     [self presentViewController:alert animated:YES completion:nil];
 }
 
+-(void)insertIntoSamples:(HKQuantitySample *)sample {
+    NSDateFormatter* theDateFormatter = [[NSDateFormatter alloc] init];
+    [theDateFormatter setFormatterBehavior:NSDateFormatterBehaviorDefault];
+    [theDateFormatter setDateFormat:@"yyyyMMdd"];
+    NSString *todayKey = [theDateFormatter stringFromDate:sample.startDate];
+    NSString *sampleKey = [_samplesDictionaryKeysOrderedByDate objectAtIndex:(_samplesDictionaryKeysOrderedByDate.count-1)];
+    
+    if ([sampleKey isEqualToString:todayKey]) {
+        NSMutableDictionary *dateDictionary = [_samples objectForKey:sampleKey];
+        NSMutableArray *sectionSamples = [dateDictionary objectForKey:@"samples"];
+        if (sectionSamples == nil) {
+            sectionSamples = [@[] mutableCopy];
+        }
+        
+        [sectionSamples addObject:sample];
+        [self updateUIForNewSample:NO];
+    } else {
+        double sampleValue = [sample.quantity doubleValueForUnit:[HKUnit unitFromString:@"g"]];
+        NSMutableDictionary *newSample = [@{
+                                           @"date" : @"Today",
+                                           @"samples" : [@[sample] mutableCopy],
+                                           @"dailySum" : [NSNumber numberWithDouble:sampleValue]
+                                           } mutableCopy];
+
+        [_samples setObject:newSample forKey:todayKey];
+        _samplesDictionaryKeysOrderedByDate = [[_samples allKeys] sortedArrayUsingSelector:@selector(compare:)];
+        
+        [self updateUIForNewSample:YES];
+    }
+}
+
+-(void)updateUIForNewSample:(BOOL)createNewSectionInTimeline {
+    [self manageWelcomeMessageVisibility];
+    
+    NSInteger section = [_tableView numberOfSections] - 1;
+    
+    [_tableView beginUpdates];
+    
+    if (createNewSectionInTimeline) {
+        // Delete rows from previous day section
+        NSInteger numberOfRowsToDelete = [_tableView numberOfRowsInSection:section];
+        NSMutableArray *rowsToDelete = [@[] mutableCopy];
+        for (int i = 0; i < numberOfRowsToDelete; i++) {
+            NSIndexPath *indexPath = [NSIndexPath indexPathForRow:i inSection:section];
+            [rowsToDelete addObject:indexPath];
+        }
+        [_tableView deleteRowsAtIndexPaths:rowsToDelete withRowAnimation:UITableViewRowAnimationNone];
+        
+        // Create new section & row for today
+        NSIndexSet *indexSet = [NSIndexSet indexSetWithIndex:section++];
+        [_tableView insertSections:indexSet withRowAnimation:UITableViewRowAnimationNone];
+        
+        NSIndexPath *indexPath = [NSIndexPath indexPathForRow:0 inSection:section++];
+        [_tableView insertRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationNone];
+    } else {
+        NSIndexPath *indexPath = [NSIndexPath indexPathForRow:0 inSection:section];
+        [_tableView insertRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationNone];
+    }
+    
+    
+    [_tableView endUpdates];
+    [_tableView reloadData];
+}
+
 
 
 
@@ -718,25 +782,7 @@
     [_app addQuantity:quantity completion:^(HKQuantitySample *sample, NSError *error) {
         dispatch_async(dispatch_get_main_queue(), ^{
             if (!error) {
-                
-                NSString *sampleKey = [weakSelf.samplesDictionaryKeysOrderedByDate objectAtIndex:(_samplesDictionaryKeysOrderedByDate.count-1)];
-
-                if (sampleKey) {
-                    NSMutableDictionary *dateDictionary = [weakSelf.samples objectForKey:sampleKey];
-                    NSMutableArray *sectionSamples = [dateDictionary objectForKey:@"samples"];
-                    if (sectionSamples == nil) {
-                        sectionSamples = [@[] mutableCopy];
-                    }
-
-                    [sectionSamples addObject:sample];
-                    [weakSelf manageWelcomeMessageVisibility];
-
-                    NSIndexPath *indexPath = [NSIndexPath indexPathForRow:0 inSection:[weakSelf.tableView numberOfSections] - 1];
-                    [weakSelf.tableView beginUpdates];
-                    [weakSelf.tableView insertRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
-                    [weakSelf.tableView endUpdates];
-                }
-
+                [weakSelf insertIntoSamples:sample];
                 [weakSelf refreshStatistics];
                 NSLog(@"HK updated");
             } else {
