@@ -77,14 +77,12 @@
     _samples = [[_app dictionaryFromSamples:_app.samples] mutableCopy];
 
     // Get highest consumption and remove the keys
-    NSNumber *highestConsumptionTemp = [_samples objectForKey:@"highestOverallConsumptionInOneDay"];
-    _highestOverallConsumptionInOneDay = [highestConsumptionTemp doubleValue];
+    _highestOverallConsumptionInOneDay = [(NSNumber *)[_samples objectForKey:@"highestOverallConsumptionInOneDay"] doubleValue];
     [_samples removeObjectForKey:@"highestOverallConsumptionInOneDay"];
-    [_samples removeObjectForKey:@"highestSampleEntry"];
+    [_samples removeObjectForKey:@"highestSampleEntry"]; //TODO: this is not used anywhere
 
 
     _samplesDictionaryKeysOrderedByDate = [[_samples allKeys] sortedArrayUsingSelector:@selector(compare:)];
-    _highestOverallConsumptionInOneDay = [(NSNumber *)[_samples objectForKey:@"highestOverallConsumptionInOneDay"] doubleValue];
 
     [self setAddCoffeeButtonTitle:@"One" subtitle:@"Shot"];
 
@@ -171,8 +169,7 @@
             _samples = [[_app dictionaryFromSamples:samples] mutableCopy];
 
             // Get highest consumption and remove the keys
-            NSNumber *highestConsumptionTemp = [_samples objectForKey:@"highestOverallConsumptionInOneDay"];
-            _highestOverallConsumptionInOneDay = [highestConsumptionTemp doubleValue];
+            _highestOverallConsumptionInOneDay = [(NSNumber *)[_samples objectForKey:@"highestOverallConsumptionInOneDay"] doubleValue];
             [_samples removeObjectForKey:@"highestOverallConsumptionInOneDay"];
             [_samples removeObjectForKey:@"highestSampleEntry"];
 
