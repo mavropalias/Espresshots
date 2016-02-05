@@ -9,6 +9,7 @@
 #import "Timeline.h"
 #import "TimelineHeaderView.h"
 #import "ScaleCollectionViewCell.h"
+#import <QuartzCore/QuartzCore.h>
 
 @interface Timeline ()
 
@@ -669,10 +670,24 @@
 - (IBAction)addTripleAmount:(id)sender { [self addAmount:_app.defaultEspressoShotMg * 3]; }
 
 - (IBAction)addCustomAmount:(id)sender {
+    // Animate button
+    CABasicAnimation *theAnimation;
+    
+    theAnimation = [CABasicAnimation animationWithKeyPath:@"transform.scale"];
+    theAnimation.duration = 0.1;
+    theAnimation.repeatCount = 1;
+    theAnimation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
+    theAnimation.autoreverses = YES;
+    theAnimation.fromValue = [NSNumber numberWithFloat:1.0];
+    theAnimation.toValue = [NSNumber numberWithFloat:0.6];
+    [_addCoffeeButton.layer addAnimation:theAnimation forKey:@"animateOpacity"];
+
+    // Scroll timeline to the bottom
     [self.tableView setContentOffset:CGPointMake(0,
                                                  _tableView.contentSize.height - (self.view.frame.size.height / 2)
                                                  )];
     
+    // Log entry into HealthKit
     [self addAmount:_userQuantity];
 }
 
