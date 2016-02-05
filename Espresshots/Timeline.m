@@ -497,6 +497,7 @@
     NSString *sampleKey = [_samplesDictionaryKeysOrderedByDate objectAtIndex:indexPath.section];
     NSMutableDictionary *dateDictionary = [_samples objectForKey:sampleKey];
     NSArray *samplesArray = [dateDictionary objectForKey:@"samples"];
+    
     HKQuantitySample *sample = [samplesArray objectAtIndex:indexPath.row];
     
     NSString *extraInfo = @"";

@@ -300,7 +300,7 @@
             if (dicArracy == nil) {
                 dicArracy = [@[] mutableCopy];
             }
-            [dicArracy insertObject:sample atIndex:dicArracy.count];
+            [dicArracy insertObject:sample atIndex:0];
             [dateDictionary setValue:dicArracy forKey:@"samples"];
 
             // Calculate daily sum
