@@ -165,7 +165,7 @@
 - (void)refreshStatistics {
     HKQuantityType *caffeineConsumedType = [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierDietaryCaffeine];
     
-    [_app fetchSamplesForType:caffeineConsumedType unit:[HKUnit gramUnit] days:180 completion:^(NSArray *samples, NSError *error) {
+    [_app fetchSamplesForType:caffeineConsumedType unit:[HKUnit gramUnit] days:1800 completion:^(NSArray *samples, NSError *error) {
         dispatch_async(dispatch_get_main_queue(), ^{
             _samples = [[_app dictionaryFromSamples:samples] mutableCopy];
 
@@ -415,7 +415,7 @@
 // heightForHeaderInSection
 // =============================================================================
 -(CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
-    return 44.0f;
+    return 38.0f;
 }
 
 // viewForHeaderInSection
