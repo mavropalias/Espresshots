@@ -387,37 +387,41 @@
         <scene sceneID="2NH-z5-daf">
             <objects>
                 <tableViewController id="eau-0x-Oj6" customClass="SettingsTVC" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" rowHeight="44" sectionHeaderHeight="18" sectionFooterHeight="18" id="PYW-ja-qQ2">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="grouped" separatorStyle="default" rowHeight="44" sectionHeaderHeight="18" sectionFooterHeight="18" id="PYW-ja-qQ2">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
-                        <prototypes>
-                            <tableViewCell clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" reuseIdentifier="shotAmount" textLabel="LM1-wt-3Dg" detailTextLabel="SQt-T1-d63" style="IBUITableViewCellStyleValue1" id="COK-Rp-F1d">
-                                <rect key="frame" x="0.0" y="114" width="320" height="44"/>
-                                <autoresizingMask key="autoresizingMask"/>
-                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="COK-Rp-F1d" id="8jL-Ob-SWE">
-                                    <rect key="frame" x="0.0" y="0.0" width="320" height="43.5"/>
-                                    <autoresizingMask key="autoresizingMask"/>
-                                    <subviews>
-                                        <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Amount" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" enabled="NO" adjustsFontSizeToFit="NO" id="LM1-wt-3Dg">
-                                            <rect key="frame" x="15" y="12" width="57" height="20"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                            <fontDescription key="fontDescription" type="system" pointSize="16"/>
-                                            <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
-                                            <nil key="highlightedColor"/>
-                                        </label>
-                                        <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="75mg" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" enabled="NO" adjustsFontSizeToFit="NO" id="SQt-T1-d63">
-                                            <rect key="frame" x="264" y="12" width="41" height="20"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                            <fontDescription key="fontDescription" type="system" pointSize="16"/>
-                                            <color key="textColor" red="0.55686274509803924" green="0.55686274509803924" blue="0.57647058823529407" alpha="1" colorSpace="calibratedRGB"/>
-                                            <nil key="highlightedColor"/>
-                                        </label>
-                                    </subviews>
-                                </tableViewCellContentView>
-                            </tableViewCell>
-                        </prototypes>
-                        <sections/>
+                        <sections>
+                            <tableViewSection headerTitle="Caffeine amount for one espresso shot" id="9gO-6Y-cCH">
+                                <string key="footerTitle">The amount of caffeine in a shot can vary between coffees and coffee shops. The recommended default (75mg) provides a good average and makes it easy for you to focus on logging the number of shots in your coffee.</string>
+                                <cells>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="shotAmount" id="COK-Rp-F1d">
+                                        <rect key="frame" x="0.0" y="114" width="320" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="COK-Rp-F1d" id="8jL-Ob-SWE">
+                                            <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="75mg" placeholder="Default is 75mg" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="EdU-Sn-xxW">
+                                                    <rect key="frame" x="20" y="14" width="280" height="17"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                                    <textInputTraits key="textInputTraits" autocorrectionType="no" keyboardType="numberPad" keyboardAppearance="alert" returnKeyType="done" enablesReturnKeyAutomatically="YES"/>
+                                                    <connections>
+                                                        <outlet property="delegate" destination="eau-0x-Oj6" id="kYZ-1P-sQ7"/>
+                                                    </connections>
+                                                </textField>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="EdU-Sn-xxW" firstAttribute="centerY" secondItem="8jL-Ob-SWE" secondAttribute="centerY" id="4gi-5T-3Fl"/>
+                                                <constraint firstAttribute="trailingMargin" secondItem="EdU-Sn-xxW" secondAttribute="trailing" constant="12" id="7bZ-Cf-NLB"/>
+                                                <constraint firstItem="EdU-Sn-xxW" firstAttribute="leading" secondItem="8jL-Ob-SWE" secondAttribute="leadingMargin" constant="12" id="bgd-7b-mOK"/>
+                                                <constraint firstItem="EdU-Sn-xxW" firstAttribute="centerX" secondItem="8jL-Ob-SWE" secondAttribute="centerX" id="phw-kl-iuD"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                </cells>
+                            </tableViewSection>
+                        </sections>
                         <connections>
                             <outlet property="delegate" destination="eau-0x-Oj6" id="04V-Vk-0ST"/>
                         </connections>
