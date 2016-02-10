@@ -5,6 +5,7 @@
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="9530"/>
         <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
+        <capability name="Constraints with non-1.0 multipliers" minToolsVersion="5.1"/>
     </dependencies>
     <scenes>
         <!--Espresshots-->
@@ -417,6 +418,44 @@
                                                 <constraint firstItem="EdU-Sn-xxW" firstAttribute="leading" secondItem="8jL-Ob-SWE" secondAttribute="leadingMargin" constant="12" id="bgd-7b-mOK"/>
                                                 <constraint firstItem="EdU-Sn-xxW" firstAttribute="centerX" secondItem="8jL-Ob-SWE" secondAttribute="centerX" id="phw-kl-iuD"/>
                                             </constraints>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                </cells>
+                            </tableViewSection>
+                            <tableViewSection headerTitle="Choose Theme" id="rIz-ry-BEF">
+                                <cells>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="shotAmount" id="6Y3-CF-jfO">
+                                        <rect key="frame" x="0.0" y="288" width="320" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="6Y3-CF-jfO" id="V40-rY-PmF">
+                                            <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="SlW-iE-xQl">
+                                                    <rect key="frame" x="0.0" y="0.0" width="160" height="44"/>
+                                                    <color key="backgroundColor" red="0.68627450980000004" green="0.1176470588" blue="0.25098039220000001" alpha="1" colorSpace="calibratedRGB"/>
+                                                </view>
+                                                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="tx4-It-FU4">
+                                                    <rect key="frame" x="160" y="0.0" width="160" height="44"/>
+                                                    <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                                                </view>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="SlW-iE-xQl" firstAttribute="centerY" secondItem="V40-rY-PmF" secondAttribute="centerY" id="4nU-3i-AcT"/>
+                                                <constraint firstItem="SlW-iE-xQl" firstAttribute="top" secondItem="V40-rY-PmF" secondAttribute="topMargin" constant="-65" id="5Tq-uo-cxv"/>
+                                                <constraint firstAttribute="trailing" secondItem="tx4-It-FU4" secondAttribute="trailing" id="833-Ag-NOy"/>
+                                                <constraint firstItem="SlW-iE-xQl" firstAttribute="height" secondItem="V40-rY-PmF" secondAttribute="height" id="8I9-pv-Axx"/>
+                                                <constraint firstItem="SlW-iE-xQl" firstAttribute="width" secondItem="V40-rY-PmF" secondAttribute="width" multiplier="1/2" id="Jot-eI-Nkl"/>
+                                                <constraint firstItem="SlW-iE-xQl" firstAttribute="leading" secondItem="V40-rY-PmF" secondAttribute="leading" id="gYz-3k-or2"/>
+                                                <constraint firstItem="tx4-It-FU4" firstAttribute="centerY" secondItem="V40-rY-PmF" secondAttribute="centerY" id="lDy-9r-MQ9"/>
+                                                <constraint firstItem="tx4-It-FU4" firstAttribute="width" secondItem="V40-rY-PmF" secondAttribute="width" multiplier="1/2" id="ro7-Lg-Cax"/>
+                                                <constraint firstItem="tx4-It-FU4" firstAttribute="height" secondItem="V40-rY-PmF" secondAttribute="height" id="wsd-9b-hOr"/>
+                                            </constraints>
+                                            <variation key="default">
+                                                <mask key="constraints">
+                                                    <exclude reference="5Tq-uo-cxv"/>
+                                                </mask>
+                                            </variation>
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                 </cells>

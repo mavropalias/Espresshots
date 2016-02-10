@@ -255,7 +255,7 @@
 }
 
 - (void)getTheme:(int)themeId {
-    themeId = 8;
+    themeId = 10;
     // old color: 93C3CC
     
     // iPhone case colors:
@@ -287,15 +287,16 @@
                         @[@"Pink",          @"FACBCC" , @"6AAD7C"],
                         @[@"Orange",        @"E05C4C" , @"159353"],
                         @[@"Red",           @"E11042" , @"009416"],
+                        @[@"Space",         @"9ECCCA" , @"B92625"]
     ];
     
     NSArray *currentTheme = [themes objectAtIndex:themeId];
     
     _tintColor = [_app colorWithHex:[currentTheme objectAtIndex:1]];
-    _bgColor = [_app colorWithHex:@"000000"];
+    _bgColor = [_app colorWithHex:@"230C15"];
     _textOnBgColor = [_app colorWithHex:@"FF197D"];
     _dailyProgressBarColorHighlighted = [_app colorWithHex:[currentTheme objectAtIndex:2]];
-    _dailyProgressBarColor = [_app colorWithHex:[currentTheme objectAtIndex:2]];;
+    _dailyProgressBarColor = [_app colorWithHex:[currentTheme objectAtIndex:2]];
     _dailyTextColor = [_app colorWithHex:@"bbbbbb"];
     _sampleTextColor = [_app colorWithHex:@"bbbbbb"];
 }
